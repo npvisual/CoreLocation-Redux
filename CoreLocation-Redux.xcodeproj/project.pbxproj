@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -11,10 +11,16 @@
 		8ECC812925101DD200CC8427 /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC812825101DD200CC8427 /* Tests_macOS.swift */; };
 		8ECC812B25101DD200CC8427 /* CoreLocation_ReduxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC810225101DD000CC8427 /* CoreLocation_ReduxApp.swift */; };
 		8ECC812C25101DD200CC8427 /* CoreLocation_ReduxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC810225101DD000CC8427 /* CoreLocation_ReduxApp.swift */; };
-		8ECC812D25101DD200CC8427 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC810325101DD000CC8427 /* ContentView.swift */; };
-		8ECC812E25101DD200CC8427 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC810325101DD000CC8427 /* ContentView.swift */; };
+		8ECC812D25101DD200CC8427 /* Content.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC810325101DD000CC8427 /* Content.swift */; };
+		8ECC812E25101DD200CC8427 /* Content.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC810325101DD000CC8427 /* Content.swift */; };
 		8ECC812F25101DD200CC8427 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8ECC810425101DD200CC8427 /* Assets.xcassets */; };
 		8ECC813025101DD200CC8427 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8ECC810425101DD200CC8427 /* Assets.xcassets */; };
+		8ECC814125101E5E00CC8427 /* CombineRex in Frameworks */ = {isa = PBXBuildFile; productRef = 8ECC814025101E5E00CC8427 /* CombineRex */; };
+		8ECC814425101E8600CC8427 /* CombineRextensions in Frameworks */ = {isa = PBXBuildFile; productRef = 8ECC814325101E8600CC8427 /* CombineRextensions */; };
+		8ECC8147251025DC00CC8427 /* CoreLocationMiddleware in Frameworks */ = {isa = PBXBuildFile; productRef = 8ECC8146251025DC00CC8427 /* CoreLocationMiddleware */; };
+		8ECC81492510294500CC8427 /* ReduxAppModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC81482510294500CC8427 /* ReduxAppModule.swift */; };
+		8ECC814A2510294500CC8427 /* ReduxAppModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC81482510294500CC8427 /* ReduxAppModule.swift */; };
+		8ECC814D25102A7600CC8427 /* LoggerMiddleware in Frameworks */ = {isa = PBXBuildFile; productRef = 8ECC814C25102A7600CC8427 /* LoggerMiddleware */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,7 +42,7 @@
 
 /* Begin PBXFileReference section */
 		8ECC810225101DD000CC8427 /* CoreLocation_ReduxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreLocation_ReduxApp.swift; sourceTree = "<group>"; };
-		8ECC810325101DD000CC8427 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		8ECC810325101DD000CC8427 /* Content.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Content.swift; sourceTree = "<group>"; };
 		8ECC810425101DD200CC8427 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8ECC810925101DD200CC8427 /* CoreLocation-Redux.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CoreLocation-Redux.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8ECC810C25101DD200CC8427 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -49,6 +55,7 @@
 		8ECC812425101DD200CC8427 /* Tests macOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests macOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8ECC812825101DD200CC8427 /* Tests_macOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOS.swift; sourceTree = "<group>"; };
 		8ECC812A25101DD200CC8427 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8ECC81482510294500CC8427 /* ReduxAppModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReduxAppModule.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +63,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8ECC814125101E5E00CC8427 /* CombineRex in Frameworks */,
+				8ECC8147251025DC00CC8427 /* CoreLocationMiddleware in Frameworks */,
+				8ECC814D25102A7600CC8427 /* LoggerMiddleware in Frameworks */,
+				8ECC814425101E8600CC8427 /* CombineRextensions in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,7 +110,8 @@
 			isa = PBXGroup;
 			children = (
 				8ECC810225101DD000CC8427 /* CoreLocation_ReduxApp.swift */,
-				8ECC810325101DD000CC8427 /* ContentView.swift */,
+				8ECC810325101DD000CC8427 /* Content.swift */,
+				8ECC81482510294500CC8427 /* ReduxAppModule.swift */,
 				8ECC810425101DD200CC8427 /* Assets.xcassets */,
 			);
 			path = Shared;
@@ -167,6 +179,12 @@
 			dependencies = (
 			);
 			name = "CoreLocation-Redux (iOS)";
+			packageProductDependencies = (
+				8ECC814025101E5E00CC8427 /* CombineRex */,
+				8ECC814325101E8600CC8427 /* CombineRextensions */,
+				8ECC8146251025DC00CC8427 /* CoreLocationMiddleware */,
+				8ECC814C25102A7600CC8427 /* LoggerMiddleware */,
+			);
 			productName = "CoreLocation-Redux (iOS)";
 			productReference = 8ECC810925101DD200CC8427 /* CoreLocation-Redux.app */;
 			productType = "com.apple.product-type.application";
@@ -258,6 +276,12 @@
 				Base,
 			);
 			mainGroup = 8ECC80FC25101DCF00CC8427;
+			packageReferences = (
+				8ECC813F25101E5E00CC8427 /* XCRemoteSwiftPackageReference "SwiftRex" */,
+				8ECC814225101E8600CC8427 /* XCRemoteSwiftPackageReference "CombineRextensions" */,
+				8ECC8145251025DC00CC8427 /* XCRemoteSwiftPackageReference "CoreLocationMiddleware" */,
+				8ECC814B25102A7600CC8427 /* XCRemoteSwiftPackageReference "LoggerMiddleware" */,
+			);
 			productRefGroup = 8ECC810A25101DD200CC8427 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -308,8 +332,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8ECC812D25101DD200CC8427 /* ContentView.swift in Sources */,
+				8ECC812D25101DD200CC8427 /* Content.swift in Sources */,
 				8ECC812B25101DD200CC8427 /* CoreLocation_ReduxApp.swift in Sources */,
+				8ECC81492510294500CC8427 /* ReduxAppModule.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -317,8 +342,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8ECC812E25101DD200CC8427 /* ContentView.swift in Sources */,
+				8ECC812E25101DD200CC8427 /* Content.swift in Sources */,
 				8ECC812C25101DD200CC8427 /* CoreLocation_ReduxApp.swift in Sources */,
+				8ECC814A2510294500CC8427 /* ReduxAppModule.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -526,7 +552,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.npvtech.CoreLocation-Redux";
 				PRODUCT_NAME = "CoreLocation-Redux";
 				SDKROOT = macosx;
@@ -550,7 +576,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.npvtech.CoreLocation-Redux";
 				PRODUCT_NAME = "CoreLocation-Redux";
 				SDKROOT = macosx;
@@ -616,7 +642,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.npvtech.Tests-macOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -638,7 +664,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.npvtech.Tests-macOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -696,6 +722,64 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8ECC813F25101E5E00CC8427 /* XCRemoteSwiftPackageReference "SwiftRex" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftRex/SwiftRex.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.7.4;
+			};
+		};
+		8ECC814225101E8600CC8427 /* XCRemoteSwiftPackageReference "CombineRextensions" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/teufelaudio/CombineRextensions.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		8ECC8145251025DC00CC8427 /* XCRemoteSwiftPackageReference "CoreLocationMiddleware" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/npvisual/CoreLocationMiddleware.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		8ECC814B25102A7600CC8427 /* XCRemoteSwiftPackageReference "LoggerMiddleware" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftRex/LoggerMiddleware.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8ECC814025101E5E00CC8427 /* CombineRex */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8ECC813F25101E5E00CC8427 /* XCRemoteSwiftPackageReference "SwiftRex" */;
+			productName = CombineRex;
+		};
+		8ECC814325101E8600CC8427 /* CombineRextensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8ECC814225101E8600CC8427 /* XCRemoteSwiftPackageReference "CombineRextensions" */;
+			productName = CombineRextensions;
+		};
+		8ECC8146251025DC00CC8427 /* CoreLocationMiddleware */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8ECC8145251025DC00CC8427 /* XCRemoteSwiftPackageReference "CoreLocationMiddleware" */;
+			productName = CoreLocationMiddleware;
+		};
+		8ECC814C25102A7600CC8427 /* LoggerMiddleware */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8ECC814B25102A7600CC8427 /* XCRemoteSwiftPackageReference "LoggerMiddleware" */;
+			productName = LoggerMiddleware;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8ECC80FD25101DCF00CC8427 /* Project object */;
 }
