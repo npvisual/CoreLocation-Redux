@@ -39,16 +39,18 @@ struct Content: View {
             }
             .padding()
             VStack {
-                Button(action: {}) {
-                    Text("Request Location")
-                }
+                Button(
+                    viewModel.state.button1.title.localizedCapitalized,
+                    action: {
+                        viewModel.state.button1.action.map { action in viewModel.dispatch(action) }
+                    }
+                )
             }
             .padding()
             Section(header: Text("Output data").font(.title3)) {
-                Text("Position : ")
+                Text(viewModel.state.textFieldA.title + viewModel.state.textFieldA.value)
             }
         }
-        
     }
 }
 
@@ -63,7 +65,7 @@ struct Content_Previews: PreviewProvider {
 }
 
 extension Content {
-    enum ViewAction {
+    enum ViewAction: Equatable {
         case toggleA(Bool)
         case button1Tapped
         case button2Tapped
@@ -73,6 +75,7 @@ extension Content {
         let titleView: String
         let toggleA: ContentItem<Bool>
         let toggleB: ContentItem<Bool>
+        let button1: ContentItem<String>
         let textFieldA: ContentItem<String>
         let textFieldB: ContentItem<String>
         
@@ -81,6 +84,7 @@ extension Content {
                 titleView: "",
                 toggleA: ContentItem(title: "", value: false),
                 toggleB: ContentItem(title: "", value: false),
+                button1: Content.ContentItem(title: "", value: ""),
                 textFieldA: ContentItem(title: "", value: ""),
                 textFieldB: ContentItem(title: "", value: "")
             )
@@ -91,6 +95,7 @@ extension Content {
                 titleView: "Some Application",
                 toggleA: ContentItem(title: "Toggle A :", value: false),
                 toggleB: ContentItem(title: "Toggle B :", value: false),
+                button1: Content.ContentItem(title: "Button 1", value: "", action: ViewAction.button1Tapped),
                 textFieldA: ContentItem(title: "Title :", value: "A"),
                 textFieldB: ContentItem(title: "Title :", value: "B")
             )
@@ -100,5 +105,6 @@ extension Content {
     struct ContentItem<T>: Equatable where T:Equatable {
         let title: String
         let value: T
+        var action: ViewAction? = nil
     }
 }

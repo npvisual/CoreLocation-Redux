@@ -11,9 +11,14 @@ import CombineRex
 import CombineRextensions
 import LoggerMiddleware
 import CoreLocationMiddleware
+import CoreLocation
 
 enum AppAction {
     case toggleLocationServices(Bool)
+    case toggleAuthorization(Bool)
+    case lastKnownPosition(CLLocation)
+    case requestPosition
+    case triggerError(Error)
 }
 
 struct AppState: Equatable {
@@ -25,13 +30,21 @@ struct AppState: Equatable {
     let titleSLCServices = "SLC Monitoring"
     let titleRegionMonitoring = "Region Monitoring"
     let titleBeaconRanging = "Beacon Ranging"
+    let titleLocation = "Position : "
+    let titleGetLocation = "Request Position !"
+    let titleAuthorizationStatus = "Authorization Status : "
     
     // Application logic
-    let isLocationEnabled: Bool
-    let isLocationCapable: Bool
-    let isGPSCapable: Bool
-    let isSignificantLocationChangeEnabled: Bool = false
-    let isRegionMonitoringEnabled: Bool = false
+    var isLocationEnabled: Bool
+    var isLocationCapable: Bool
+    var isGPSCapable: Bool
+    var isSignificantLocationChangeEnabled: Bool = false
+    var isRegionMonitoringEnabled: Bool = false
+    var isAuthorized: Bool = false
+    
+    var location: CLLocation = CLLocation()
+    
+    var error: String = ""
     
     static var empty: AppState {
         .init(
@@ -77,31 +90,41 @@ let appMiddleware = LoggerMiddleware<IdentityMiddleware<AppAction, AppAction, Ap
                 } else {
                     return LocationAction.stopMonitoring
                 }
+            case .requestPosition: return LocationAction.startMonitoring
+            default: return nil
             }
         },
         outputActionMap: { action in
             switch action {
             case .startMonitoring: return AppAction.toggleLocationServices(true)
             case .stopMonitoring: return AppAction.toggleLocationServices(false)
+            case .authorized: return AppAction.toggleAuthorization(true)
+            case let .gotPosition(location): return AppAction.lastKnownPosition(location)
+            case let .receiveError(error): return AppAction.triggerError(error)
             default: return AppAction.toggleLocationServices(false)
             }
         },
-        stateMap: { _ in
-            LocationState.notAuthorized
+        stateMap: { globalState in
+            if globalState.isAuthorized && globalState.isLocationEnabled {
+                return LocationState.authorized(lastPosition: globalState.location)
+            } else {
+                return LocationState.notAuthorized
+            }
         }
     )
 
 // MARK: - REDUCERS
 extension Reducer where ActionType == AppAction, StateType == AppState {
     static let app = Reducer { action, state in
+        var state = state
         switch action {
-        case let .toggleLocationServices(value):
-            return AppState(
-                isLocationEnabled: value,
-                isLocationCapable: state.isLocationCapable,
-                isGPSCapable: state.isGPSCapable
-            )
+        case let .toggleLocationServices(status): state.isLocationEnabled = status
+        case let .toggleAuthorization(status): state.isAuthorized = status
+        case let .lastKnownPosition(location): state.location = location
+        case .requestPosition: break
+        case let .triggerError(error): state.error = error.localizedDescription
         }
+        return state
     }
 }
 
@@ -117,7 +140,7 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
     private static func transform(_ viewAction: Content.ViewAction) -> AppAction? {
         switch viewAction {
         case .toggleA(let value): return .toggleLocationServices(value)
-        case .button1Tapped: return nil
+        case .button1Tapped: return .requestPosition
         case .button2Tapped: return nil
         }
     }
@@ -127,8 +150,12 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
             titleView: state.appTitle,
             toggleA: Content.ContentItem(title: state.titleLocationServices, value: state.isLocationEnabled),
             toggleB: Content.ContentItem(title: state.titleSLCServices, value: false),
-            textFieldA: Content.ContentItem(title: "Position : ", value: "Lat: xxx, Lon: xxx"),
-            textFieldB: Content.ContentItem(title: "Authorization Status : ", value: "Unknown")
+            button1: Content.ContentItem(title: state.titleGetLocation, value: "", action: .button1Tapped),
+            textFieldA: Content.ContentItem(
+                title: state.titleLocation,
+                value: "Lat : " + state.location.coordinate.latitude.description + "; Lon : " + state.location.coordinate.longitude.description
+            ),
+            textFieldB: Content.ContentItem(title: state.titleAuthorizationStatus, value: state.isAuthorized.description)
         )
     }
 }
