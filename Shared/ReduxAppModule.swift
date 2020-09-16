@@ -24,15 +24,29 @@ enum AppAction {
 struct AppState: Equatable {
     
     // Static content
-    let appTitle = "Core Location with Redux !"
+    
+    // App related content
+    let appTitle = "CoreLocation with Redux !"
     let appUsage = "Use the toggle switches to turn on/off some of the Core Location services."
-    let titleLocationServices = "Location Services"
+    
+    // Section headers
+    let titleAuthorization = "Authorization"
+    let titleLocationServices = "Location Monitoring"
     let titleSLCServices = "SLC Monitoring"
     let titleRegionMonitoring = "Region Monitoring"
     let titleBeaconRanging = "Beacon Ranging"
-    let titleLocation = "Position : "
-    let titleGetLocation = "Request Position !"
-    let titleAuthorizationStatus = "Authorization Status : "
+    let titleHeadingMonitoring = "Heading Updates"
+    let titleVisitMonitoring = "Visits Monitoring"
+    
+    // Labels
+    let labelAuthorizationStatus = "Authorization Status : "
+    let labelGetAuthorization = "Request Authorization !"
+    let labelPosition = "Position : "
+    let labelGetLocation = "Request Position !"
+    let labelToggleLocationServices = "Monitor Location"
+    let labelToggleSCLMonitoring = "Significant Location"
+    let labelToggleHeadingMonitoring = "Update Heading"
+    let labelToggleVisitsMonitoring = "Receive Visit-related Events"
     
     // Application logic
     var isLocationEnabled: Bool
@@ -47,6 +61,13 @@ struct AppState: Equatable {
     var error: String = ""
     
     static var empty: AppState {
+        .init(
+            isLocationEnabled: false,
+            isLocationCapable: false,
+            isGPSCapable: false)
+    }
+    
+    static var mock: AppState {
         .init(
             isLocationEnabled: false,
             isLocationCapable: false,
@@ -141,21 +162,27 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
         switch viewAction {
         case .toggleA(let value): return .toggleLocationServices(value)
         case .button1Tapped: return .requestPosition
-        case .button2Tapped: return nil
+        case .authorizationButtonTapped: return nil
         }
     }
     
     private static func transform(from state: AppState) -> Content.ViewState {
         Content.ViewState(
             titleView: state.appTitle,
-            toggleA: Content.ContentItem(title: state.titleLocationServices, value: state.isLocationEnabled),
-            toggleB: Content.ContentItem(title: state.titleSLCServices, value: false),
-            button1: Content.ContentItem(title: state.titleGetLocation, value: "", action: .button1Tapped),
-            textFieldA: Content.ContentItem(
-                title: state.titleLocation,
-                value: "Lat : " + state.location.coordinate.latitude.description + "; Lon : " + state.location.coordinate.longitude.description
+            sectionAuthorizationTitle: state.titleAuthorization,
+            sectionLocationMonitoringTitle: state.titleLocationServices,
+            sectionSLCMonitoringTitle: state.titleSLCServices,
+            sectionRegionMonitoringTitle: state.titleRegionMonitoring,
+            sectionBeaconRangingTitle: state.titleBeaconRanging,
+            toggleLocationServices: Content.ContentItem(title: state.labelToggleLocationServices, value: state.isLocationEnabled),
+            toggleSCLServices: Content.ContentItem(title: state.titleSLCServices, value: false),
+            buttonAuthorizationRequest: Content.ContentItem(title: state.labelGetAuthorization, value: "", action: .authorizationButtonTapped),
+            buttonLocationRequest: Content.ContentItem(title: state.labelGetLocation, value: "", action: .button1Tapped),
+            locationInformation: Content.ContentItem(
+                title: state.labelPosition,
+                value: "Lat : " + state.location.coordinate.latitude.description + " ; Lon : " + state.location.coordinate.longitude.description
             ),
-            textFieldB: Content.ContentItem(title: state.titleAuthorizationStatus, value: state.isAuthorized.description)
+            textAuthorization: Content.ContentItem(title: state.labelAuthorizationStatus, value: state.isAuthorized.description)
         )
     }
 }

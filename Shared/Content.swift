@@ -19,36 +19,52 @@ struct Content: View {
             Text(viewModel.state.titleView)
                 .font(.title)
                 .padding()
-            Text("")
-            VStack {
-                Toggle(
-                    viewModel: viewModel,
-                    state: \.toggleA.value,
-                    onToggle: { ViewAction.toggleA($0) }) {
-                    Text(viewModel.state.toggleA.title)
+            Form {
+                Section(header: Text(viewModel.state.sectionAuthorizationTitle)) {
+                    Text(viewModel.state.textAuthorization.title + viewModel.state.textAuthorization.value)
+                    Text("Authorization accuracy : Unknown")
+                    Button(
+                        viewModel.state.buttonAuthorizationRequest.title.localizedCapitalized,
+                        action: {
+                            viewModel.state.buttonAuthorizationRequest.action.map { action in viewModel.dispatch(action) }
+                        }
+                    )
                 }
-                Toggle(isOn: .constant(false)) {
-                    Text(viewModel.state.toggleB.title)
+                Section {
+                    Text(viewModel.state.locationInformation.title + viewModel.state.locationInformation.value)
                 }
-                Toggle(isOn: .constant(false)) {
-                    Text("Region Monitoring")
-                }
-                Toggle(isOn: .constant(false)) {
-                    Text("Beacon Ranging")
-                }
-            }
-            .padding()
-            VStack {
-                Button(
-                    viewModel.state.button1.title.localizedCapitalized,
-                    action: {
-                        viewModel.state.button1.action.map { action in viewModel.dispatch(action) }
+                Section(header: Text(viewModel.state.sectionLocationMonitoringTitle)) {
+                    Toggle(
+                        viewModel: viewModel,
+                        state: \.toggleLocationServices.value,
+                        onToggle: { ViewAction.toggleA($0) }) {
+                        Text(viewModel.state.toggleLocationServices.title)
                     }
-                )
-            }
-            .padding()
-            Section(header: Text("Output data").font(.title3)) {
-                Text(viewModel.state.textFieldA.title + viewModel.state.textFieldA.value)
+                    Button(
+                        viewModel.state.buttonLocationRequest.title.localizedCapitalized,
+                        action: {
+                            viewModel.state.buttonLocationRequest.action.map { action in viewModel.dispatch(action) }
+                        }
+                    )
+                }
+                Section(header: Text(viewModel.state.sectionSLCMonitoringTitle)) {
+                    Toggle(
+                        viewModel: viewModel,
+                        state: \.toggleSCLServices.value,
+                        onToggle: { ViewAction.toggleA($0) }) {
+                        Text(viewModel.state.toggleSCLServices.title)
+                    }
+                }
+                Section(header: Text(viewModel.state.sectionRegionMonitoringTitle)) {
+                    Toggle(isOn: .constant(false)) {
+                        Text("Region Monitoring")
+                    }
+                }
+                Section(header: Text(viewModel.state.sectionBeaconRangingTitle)) {
+                    Toggle(isOn: .constant(false)) {
+                        Text("Beacon Ranging")
+                    }
+                }
             }
         }
     }
@@ -56,11 +72,17 @@ struct Content: View {
 
 struct Content_Previews: PreviewProvider {
     
-    static let mockState = Content.ViewState.mock
-    static let mockStore = ObservableViewModel<Content.ViewAction, Content.ViewState>.mock(state: mockState)
+    static let mockState = AppState.mock
+    static let mockStore = ObservableViewModel<AppAction, AppState>.mock(
+        state: mockState,
+        action: { action, _, state in
+            state = Reducer.app.reduce(action, state)
+        }
+    )
+    static let mockViewModel = ObservableViewModel.content(store: mockStore)
     
     static var previews: some View {
-        Content(viewModel: mockStore)
+        Content(viewModel: mockViewModel)
     }
 }
 
@@ -68,36 +90,38 @@ extension Content {
     enum ViewAction: Equatable {
         case toggleA(Bool)
         case button1Tapped
-        case button2Tapped
+        case authorizationButtonTapped
     }
     
     struct ViewState: Equatable {
         let titleView: String
-        let toggleA: ContentItem<Bool>
-        let toggleB: ContentItem<Bool>
-        let button1: ContentItem<String>
-        let textFieldA: ContentItem<String>
-        let textFieldB: ContentItem<String>
+        let sectionAuthorizationTitle: String
+        let sectionLocationMonitoringTitle: String
+        let sectionSLCMonitoringTitle: String
+        let sectionRegionMonitoringTitle: String
+        let sectionBeaconRangingTitle: String
+        let toggleLocationServices: ContentItem<Bool>
+        let toggleSCLServices: ContentItem<Bool>
+        let buttonAuthorizationRequest: ContentItem<String>
+        let buttonLocationRequest: ContentItem<String>
+        let locationInformation: ContentItem<String>
+        let textAuthorization: ContentItem<String>
+        
         
         static var empty: ViewState {
             .init(
                 titleView: "",
-                toggleA: ContentItem(title: "", value: false),
-                toggleB: ContentItem(title: "", value: false),
-                button1: Content.ContentItem(title: "", value: ""),
-                textFieldA: ContentItem(title: "", value: ""),
-                textFieldB: ContentItem(title: "", value: "")
-            )
-        }
-        
-        static var mock: ViewState {
-            .init(
-                titleView: "Some Application",
-                toggleA: ContentItem(title: "Toggle A :", value: false),
-                toggleB: ContentItem(title: "Toggle B :", value: false),
-                button1: Content.ContentItem(title: "Button 1", value: "", action: ViewAction.button1Tapped),
-                textFieldA: ContentItem(title: "Title :", value: "A"),
-                textFieldB: ContentItem(title: "Title :", value: "B")
+                sectionAuthorizationTitle: "",
+                sectionLocationMonitoringTitle: "",
+                sectionSLCMonitoringTitle: "",
+                sectionRegionMonitoringTitle: "",
+                sectionBeaconRangingTitle: "",
+                toggleLocationServices: Content.ContentItem(title: "", value: false),
+                toggleSCLServices: Content.ContentItem(title: "", value: false),
+                buttonAuthorizationRequest: Content.ContentItem(title: "", value: ""),
+                buttonLocationRequest: Content.ContentItem(title: "", value: ""),
+                locationInformation: Content.ContentItem(title: "", value: ""),
+                textAuthorization: Content.ContentItem(title: "", value: "")
             )
         }
     }
