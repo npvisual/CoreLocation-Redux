@@ -16,6 +16,7 @@ import CoreLocation
 enum AppAction {
     case toggleLocationServices(Bool)
     case toggleAuthorization(Bool)
+    case getAuthorizationStatus
     case lastKnownPosition(CLLocation)
     case requestPosition
     case triggerError(Error)
@@ -47,6 +48,7 @@ struct AppState: Equatable {
     let labelToggleSCLMonitoring = "Significant Location"
     let labelToggleHeadingMonitoring = "Update Heading"
     let labelToggleVisitsMonitoring = "Receive Visit-related Events"
+    let labelToggleAuthType = "Always on ?"
     
     // Application logic
     var isLocationEnabled: Bool
@@ -55,6 +57,7 @@ struct AppState: Equatable {
     var isSignificantLocationChangeEnabled: Bool = false
     var isRegionMonitoringEnabled: Bool = false
     var isAuthorized: Bool = false
+    var isAlwaysOnLocation: Bool = false
     
     var location: CLLocation = CLLocation()
     
@@ -107,11 +110,12 @@ let appMiddleware = LoggerMiddleware<IdentityMiddleware<AppAction, AppAction, Ap
             switch globalAction {
             case let .toggleLocationServices(status):
                 if status {
-                    return LocationAction.startMonitoring
+                    return LocationAction.startMonitoring(.always)
                 } else {
                     return LocationAction.stopMonitoring
                 }
-            case .requestPosition: return LocationAction.startMonitoring
+            case .requestPosition: return LocationAction.startMonitoring(.always)
+            case .getAuthorizationStatus: return LocationAction.getAuthorizationStatus
             default: return nil
             }
         },
@@ -140,10 +144,11 @@ extension Reducer where ActionType == AppAction, StateType == AppState {
         var state = state
         switch action {
         case let .toggleLocationServices(status): state.isLocationEnabled = status
-        case let .toggleAuthorization(status): state.isAuthorized = status
+        case let .toggleAuthorization(status): state.isAlwaysOnLocation = status
         case let .lastKnownPosition(location): state.location = location
-        case .requestPosition: break
         case let .triggerError(error): state.error = error.localizedDescription
+        case .getAuthorizationStatus: break
+        case .requestPosition: break
         }
         return state
     }
@@ -160,9 +165,10 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
     
     private static func transform(_ viewAction: Content.ViewAction) -> AppAction? {
         switch viewAction {
-        case .toggleA(let value): return .toggleLocationServices(value)
-        case .button1Tapped: return .requestPosition
-        case .authorizationButtonTapped: return nil
+        case .toggleAuthType(let value): return .toggleAuthorization(value)
+        case .toggleLocationMonitoring(let value): return .toggleLocationServices(value)
+        case .getPositionButtonTapped: return .requestPosition
+        case .getAuthorizationButtonTapped: return .getAuthorizationStatus
         }
     }
     
@@ -176,8 +182,9 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
             sectionBeaconRangingTitle: state.titleBeaconRanging,
             toggleLocationServices: Content.ContentItem(title: state.labelToggleLocationServices, value: state.isLocationEnabled),
             toggleSCLServices: Content.ContentItem(title: state.titleSLCServices, value: false),
-            buttonAuthorizationRequest: Content.ContentItem(title: state.labelGetAuthorization, value: "", action: .authorizationButtonTapped),
-            buttonLocationRequest: Content.ContentItem(title: state.labelGetLocation, value: "", action: .button1Tapped),
+            toggleAuthType: Content.ContentItem(title: state.labelToggleAuthType, value: state.isAlwaysOnLocation),
+            buttonAuthorizationRequest: Content.ContentItem(title: state.labelGetAuthorization, value: "", action: .getAuthorizationButtonTapped),
+            buttonLocationRequest: Content.ContentItem(title: state.labelGetLocation, value: "", action: .getPositionButtonTapped),
             locationInformation: Content.ContentItem(
                 title: state.labelPosition,
                 value: "Lat : " + state.location.coordinate.latitude.description + " ; Lon : " + state.location.coordinate.longitude.description

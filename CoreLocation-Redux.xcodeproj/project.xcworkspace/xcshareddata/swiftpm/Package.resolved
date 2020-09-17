@@ -12,10 +12,10 @@
       },
       {
         "package": "CoreLocationMiddleware",
-        "repositoryURL": "https://github.com/npvisual/CoreLocationMiddleware.git",
+        "repositoryURL": "https://github.com/SwiftRex/CoreLocationMiddleware",
         "state": {
-          "branch": "main",
-          "revision": "0be1b8f3ea0fd56fb5956c1b5e5cba0dcf39bebd",
+          "branch": "development",
+          "revision": "7c5b66043f1cec02f81cc6355fa842799850a34c",
           "version": null
         }
       },

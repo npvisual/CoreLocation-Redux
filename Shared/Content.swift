@@ -22,6 +22,12 @@ struct Content: View {
             Form {
                 Section(header: Text(viewModel.state.sectionAuthorizationTitle)) {
                     Text(viewModel.state.textAuthorization.title + viewModel.state.textAuthorization.value)
+                    Toggle(
+                        viewModel: viewModel,
+                        state: \.toggleAuthType.value,
+                        onToggle: { ViewAction.toggleAuthType($0) }) {
+                        Text(viewModel.state.toggleAuthType.title)
+                    }
                     Text("Authorization accuracy : Unknown")
                     Button(
                         viewModel.state.buttonAuthorizationRequest.title.localizedCapitalized,
@@ -37,7 +43,7 @@ struct Content: View {
                     Toggle(
                         viewModel: viewModel,
                         state: \.toggleLocationServices.value,
-                        onToggle: { ViewAction.toggleA($0) }) {
+                        onToggle: { ViewAction.toggleLocationMonitoring($0) }) {
                         Text(viewModel.state.toggleLocationServices.title)
                     }
                     Button(
@@ -51,7 +57,7 @@ struct Content: View {
                     Toggle(
                         viewModel: viewModel,
                         state: \.toggleSCLServices.value,
-                        onToggle: { ViewAction.toggleA($0) }) {
+                        onToggle: { ViewAction.toggleLocationMonitoring($0) }) {
                         Text(viewModel.state.toggleSCLServices.title)
                     }
                 }
@@ -88,9 +94,10 @@ struct Content_Previews: PreviewProvider {
 
 extension Content {
     enum ViewAction: Equatable {
-        case toggleA(Bool)
-        case button1Tapped
-        case authorizationButtonTapped
+        case toggleAuthType(Bool)
+        case toggleLocationMonitoring(Bool)
+        case getAuthorizationButtonTapped
+        case getPositionButtonTapped
     }
     
     struct ViewState: Equatable {
@@ -102,6 +109,7 @@ extension Content {
         let sectionBeaconRangingTitle: String
         let toggleLocationServices: ContentItem<Bool>
         let toggleSCLServices: ContentItem<Bool>
+        let toggleAuthType: ContentItem<Bool>
         let buttonAuthorizationRequest: ContentItem<String>
         let buttonLocationRequest: ContentItem<String>
         let locationInformation: ContentItem<String>
@@ -118,6 +126,7 @@ extension Content {
                 sectionBeaconRangingTitle: "",
                 toggleLocationServices: Content.ContentItem(title: "", value: false),
                 toggleSCLServices: Content.ContentItem(title: "", value: false),
+                toggleAuthType: Content.ContentItem(title: "", value: false),
                 buttonAuthorizationRequest: Content.ContentItem(title: "", value: ""),
                 buttonLocationRequest: Content.ContentItem(title: "", value: ""),
                 locationInformation: Content.ContentItem(title: "", value: ""),

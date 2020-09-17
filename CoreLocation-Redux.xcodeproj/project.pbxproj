@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8EC902602512CF5100106B71 /* CoreLocationMiddleware in Frameworks */ = {isa = PBXBuildFile; productRef = 8EC9025F2512CF5100106B71 /* CoreLocationMiddleware */; };
 		8ECC811E25101DD200CC8427 /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC811D25101DD200CC8427 /* Tests_iOS.swift */; };
 		8ECC812925101DD200CC8427 /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC812825101DD200CC8427 /* Tests_macOS.swift */; };
 		8ECC812B25101DD200CC8427 /* CoreLocation_ReduxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC810225101DD000CC8427 /* CoreLocation_ReduxApp.swift */; };
@@ -17,7 +18,6 @@
 		8ECC813025101DD200CC8427 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8ECC810425101DD200CC8427 /* Assets.xcassets */; };
 		8ECC814125101E5E00CC8427 /* CombineRex in Frameworks */ = {isa = PBXBuildFile; productRef = 8ECC814025101E5E00CC8427 /* CombineRex */; };
 		8ECC814425101E8600CC8427 /* CombineRextensions in Frameworks */ = {isa = PBXBuildFile; productRef = 8ECC814325101E8600CC8427 /* CombineRextensions */; };
-		8ECC8147251025DC00CC8427 /* CoreLocationMiddleware in Frameworks */ = {isa = PBXBuildFile; productRef = 8ECC8146251025DC00CC8427 /* CoreLocationMiddleware */; };
 		8ECC81492510294500CC8427 /* ReduxAppModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC81482510294500CC8427 /* ReduxAppModule.swift */; };
 		8ECC814A2510294500CC8427 /* ReduxAppModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC81482510294500CC8427 /* ReduxAppModule.swift */; };
 		8ECC814D25102A7600CC8427 /* LoggerMiddleware in Frameworks */ = {isa = PBXBuildFile; productRef = 8ECC814C25102A7600CC8427 /* LoggerMiddleware */; };
@@ -64,8 +64,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				8ECC814125101E5E00CC8427 /* CombineRex in Frameworks */,
-				8ECC8147251025DC00CC8427 /* CoreLocationMiddleware in Frameworks */,
 				8ECC814D25102A7600CC8427 /* LoggerMiddleware in Frameworks */,
+				8EC902602512CF5100106B71 /* CoreLocationMiddleware in Frameworks */,
 				8ECC814425101E8600CC8427 /* CombineRextensions in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -182,8 +182,8 @@
 			packageProductDependencies = (
 				8ECC814025101E5E00CC8427 /* CombineRex */,
 				8ECC814325101E8600CC8427 /* CombineRextensions */,
-				8ECC8146251025DC00CC8427 /* CoreLocationMiddleware */,
 				8ECC814C25102A7600CC8427 /* LoggerMiddleware */,
+				8EC9025F2512CF5100106B71 /* CoreLocationMiddleware */,
 			);
 			productName = "CoreLocation-Redux (iOS)";
 			productReference = 8ECC810925101DD200CC8427 /* CoreLocation-Redux.app */;
@@ -279,8 +279,8 @@
 			packageReferences = (
 				8ECC813F25101E5E00CC8427 /* XCRemoteSwiftPackageReference "SwiftRex" */,
 				8ECC814225101E8600CC8427 /* XCRemoteSwiftPackageReference "CombineRextensions" */,
-				8ECC8145251025DC00CC8427 /* XCRemoteSwiftPackageReference "CoreLocationMiddleware" */,
 				8ECC814B25102A7600CC8427 /* XCRemoteSwiftPackageReference "LoggerMiddleware" */,
+				8EC9025E2512CF5100106B71 /* XCRemoteSwiftPackageReference "CoreLocationMiddleware" */,
 			);
 			productRefGroup = 8ECC810A25101DD200CC8427 /* Products */;
 			projectDirPath = "";
@@ -724,6 +724,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		8EC9025E2512CF5100106B71 /* XCRemoteSwiftPackageReference "CoreLocationMiddleware" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftRex/CoreLocationMiddleware";
+			requirement = {
+				branch = development;
+				kind = branch;
+			};
+		};
 		8ECC813F25101E5E00CC8427 /* XCRemoteSwiftPackageReference "SwiftRex" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SwiftRex/SwiftRex.git";
@@ -740,14 +748,6 @@
 				kind = branch;
 			};
 		};
-		8ECC8145251025DC00CC8427 /* XCRemoteSwiftPackageReference "CoreLocationMiddleware" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/npvisual/CoreLocationMiddleware.git";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
 		8ECC814B25102A7600CC8427 /* XCRemoteSwiftPackageReference "LoggerMiddleware" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SwiftRex/LoggerMiddleware.git";
@@ -759,6 +759,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8EC9025F2512CF5100106B71 /* CoreLocationMiddleware */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8EC9025E2512CF5100106B71 /* XCRemoteSwiftPackageReference "CoreLocationMiddleware" */;
+			productName = CoreLocationMiddleware;
+		};
 		8ECC814025101E5E00CC8427 /* CombineRex */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8ECC813F25101E5E00CC8427 /* XCRemoteSwiftPackageReference "SwiftRex" */;
@@ -768,11 +773,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8ECC814225101E8600CC8427 /* XCRemoteSwiftPackageReference "CombineRextensions" */;
 			productName = CombineRextensions;
-		};
-		8ECC8146251025DC00CC8427 /* CoreLocationMiddleware */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8ECC8145251025DC00CC8427 /* XCRemoteSwiftPackageReference "CoreLocationMiddleware" */;
-			productName = CoreLocationMiddleware;
 		};
 		8ECC814C25102A7600CC8427 /* LoggerMiddleware */ = {
 			isa = XCSwiftPackageProductDependency;
