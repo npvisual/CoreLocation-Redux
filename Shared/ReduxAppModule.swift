@@ -115,7 +115,7 @@ let appMiddleware = LoggerMiddleware<IdentityMiddleware<AppAction, AppAction, Ap
                     return LocationAction.stopMonitoring
                 }
             case .requestPosition: return LocationAction.startMonitoring(.always)
-            case .getAuthorizationStatus: return LocationAction.getAuthorizationStatus
+            case .getAuthorizationStatus: return LocationAction.requestAuthorizationStatus
             default: return nil
             }
         },
@@ -123,7 +123,12 @@ let appMiddleware = LoggerMiddleware<IdentityMiddleware<AppAction, AppAction, Ap
             switch action {
             case .startMonitoring: return AppAction.toggleLocationServices(true)
             case .stopMonitoring: return AppAction.toggleLocationServices(false)
-            case .authorized: return AppAction.toggleAuthorization(true)
+            case let .gotAuthzStatus(status):
+                switch status {
+                case .authorizedAlways, .authorizedWhenInUse: return AppAction.toggleAuthorization(true)
+                case .denied, .restricted, .notDetermined: return AppAction.toggleAuthorization(false)
+                @unknown default: return AppAction.toggleAuthorization(false)
+                }
             case let .gotPosition(location): return AppAction.lastKnownPosition(location)
             case let .receiveError(error): return AppAction.triggerError(error)
             default: return AppAction.toggleLocationServices(false)
