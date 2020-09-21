@@ -39,6 +39,7 @@ struct AppState: Equatable {
     let titleBeaconRanging = "Beacon Ranging"
     let titleHeadingMonitoring = "Heading Updates"
     let titleVisitMonitoring = "Visits Monitoring"
+    let titleDeviceCapabilities = "Device Capabilities"
     
     // Labels
     let labelAuthorizationStatus = "Authorization Status : "
@@ -50,13 +51,17 @@ struct AppState: Equatable {
     let labelToggleHeadingMonitoring = "Update Heading"
     let labelToggleVisitsMonitoring = "Receive Visit-related Events"
     let labelToggleAuthType = "Request Always On (no impact on status) ?"
+    let labelIsAvailableSLC = "SLC service : "
+    let labelIsAvailableHeading = "Heading-related events : "
+    let labelIsAvailableMonitoring = "Region Monitoring for x : "
+    let labelIsAvailableRanging = "Ranging for iBeacon : "
     
     // Application logic
     var isLocationEnabled: Bool
-    var isLocationCapable: Bool
-    var isGPSCapable: Bool
-    var isSignificantLocationChangeEnabled: Bool = false
-    var isRegionMonitoringEnabled: Bool = false
+    var isGPSCapable: Bool = false
+    var isSignificantLocationChangeCapable: Bool = false
+    var isRegionMonitoringCapable: Bool = false
+    var isRandingCapable: Bool = false
     var isAuthorized: Bool = false
     
     var authorizationStatus: CLAuthorizationStatus = .notDetermined
@@ -66,17 +71,11 @@ struct AppState: Equatable {
     var error: String = ""
     
     static var empty: AppState {
-        .init(
-            isLocationEnabled: false,
-            isLocationCapable: false,
-            isGPSCapable: false)
+        .init(isLocationEnabled: false)
     }
     
     static var mock: AppState {
-        .init(
-            isLocationEnabled: false,
-            isLocationCapable: false,
-            isGPSCapable: false)
+        .init(isLocationEnabled: false)
     }
 }
 
