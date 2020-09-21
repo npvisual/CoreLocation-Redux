@@ -15,9 +15,10 @@ import CoreLocation
 
 enum AppAction {
     case toggleLocationServices(Bool)
-    case toggleAuthorization(Bool)
-    case getAuthorizationStatus
+    case toggleAuthorizationType(Bool)
+    case gotAuthorizationStatus(CLAuthorizationStatus)
     case lastKnownPosition(CLLocation)
+    case requestAuthorizationType
     case requestPosition
     case triggerError(Error)
 }
@@ -48,7 +49,7 @@ struct AppState: Equatable {
     let labelToggleSCLMonitoring = "Significant Location"
     let labelToggleHeadingMonitoring = "Update Heading"
     let labelToggleVisitsMonitoring = "Receive Visit-related Events"
-    let labelToggleAuthType = "Always on ?"
+    let labelToggleAuthType = "Request Always On (no impact on status) ?"
     
     // Application logic
     var isLocationEnabled: Bool
@@ -57,8 +58,9 @@ struct AppState: Equatable {
     var isSignificantLocationChangeEnabled: Bool = false
     var isRegionMonitoringEnabled: Bool = false
     var isAuthorized: Bool = false
-    var isAlwaysOnLocation: Bool = false
     
+    var authorizationStatus: CLAuthorizationStatus = .notDetermined
+    var authorizationType: AuthzType = .whenInUse
     var location: CLLocation = CLLocation()
     
     var error: String = ""
@@ -110,12 +112,12 @@ let appMiddleware = LoggerMiddleware<IdentityMiddleware<AppAction, AppAction, Ap
             switch globalAction {
             case let .toggleLocationServices(status):
                 if status {
-                    return LocationAction.startMonitoring(.always)
+                    return LocationAction.startMonitoring
                 } else {
                     return LocationAction.stopMonitoring
                 }
-            case .requestPosition: return LocationAction.startMonitoring(.always)
-            case .getAuthorizationStatus: return LocationAction.requestAuthorizationStatus
+            case .requestPosition: return LocationAction.requestPosition
+            case .requestAuthorizationType: return LocationAction.requestAuthorizationType
             default: return nil
             }
         },
@@ -123,23 +125,18 @@ let appMiddleware = LoggerMiddleware<IdentityMiddleware<AppAction, AppAction, Ap
             switch action {
             case .startMonitoring: return AppAction.toggleLocationServices(true)
             case .stopMonitoring: return AppAction.toggleLocationServices(false)
-            case let .gotAuthzStatus(status):
-                switch status {
-                case .authorizedAlways, .authorizedWhenInUse: return AppAction.toggleAuthorization(true)
-                case .denied, .restricted, .notDetermined: return AppAction.toggleAuthorization(false)
-                @unknown default: return AppAction.toggleAuthorization(false)
-                }
+            case let .gotAuthzStatus(status): return AppAction.gotAuthorizationStatus(status)
             case let .gotPosition(location): return AppAction.lastKnownPosition(location)
             case let .receiveError(error): return AppAction.triggerError(error)
             default: return AppAction.toggleLocationServices(false)
             }
         },
-        stateMap: { globalState in
-            if globalState.isAuthorized && globalState.isLocationEnabled {
-                return LocationState.authorized(lastPosition: globalState.location)
-            } else {
-                return LocationState.notAuthorized
-            }
+        stateMap: { globalState -> LocationState in
+            return LocationState(
+                authzType: globalState.authorizationType,
+                authzStatus: globalState.authorizationStatus,
+                location: globalState.location
+            )
         }
     )
 
@@ -149,11 +146,12 @@ extension Reducer where ActionType == AppAction, StateType == AppState {
         var state = state
         switch action {
         case let .toggleLocationServices(status): state.isLocationEnabled = status
-        case let .toggleAuthorization(status): state.isAlwaysOnLocation = status
+        case let .toggleAuthorizationType(status): state.authorizationType = status ? .always : .whenInUse
         case let .lastKnownPosition(location): state.location = location
         case let .triggerError(error): state.error = error.localizedDescription
-        case .getAuthorizationStatus: break
-        case .requestPosition: break
+        case let .gotAuthorizationStatus(status): state.authorizationStatus = status
+        case .requestAuthorizationType,
+             .requestPosition: break
         }
         return state
     }
@@ -170,31 +168,42 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
     
     private static func transform(_ viewAction: Content.ViewAction) -> AppAction? {
         switch viewAction {
-        case .toggleAuthType(let value): return .toggleAuthorization(value)
+        case .toggleAuthType(let value): return .toggleAuthorizationType(value)
         case .toggleLocationMonitoring(let value): return .toggleLocationServices(value)
         case .getPositionButtonTapped: return .requestPosition
-        case .getAuthorizationButtonTapped: return .getAuthorizationStatus
+        case .getAuthorizationButtonTapped: return .requestAuthorizationType
         }
     }
     
     private static func transform(from state: AppState) -> Content.ViewState {
-        Content.ViewState(
+        
+        let authStatus: String
+        
+        switch state.authorizationStatus {
+        case .authorizedAlways: authStatus = "Always"
+        case .authorizedWhenInUse: authStatus = "When In Use"
+        case .denied: authStatus = "Denied"
+        case .restricted: authStatus = "Restricted"
+        default: authStatus = "Unknown"
+        }
+        
+        return Content.ViewState(
             titleView: state.appTitle,
             sectionAuthorizationTitle: state.titleAuthorization,
             sectionLocationMonitoringTitle: state.titleLocationServices,
             sectionSLCMonitoringTitle: state.titleSLCServices,
             sectionRegionMonitoringTitle: state.titleRegionMonitoring,
             sectionBeaconRangingTitle: state.titleBeaconRanging,
+            toggleAuthType: Content.ContentItem(title: state.labelToggleAuthType, value: [AuthzType.always].contains(state.authorizationType)),
             toggleLocationServices: Content.ContentItem(title: state.labelToggleLocationServices, value: state.isLocationEnabled),
             toggleSCLServices: Content.ContentItem(title: state.titleSLCServices, value: false),
-            toggleAuthType: Content.ContentItem(title: state.labelToggleAuthType, value: state.isAlwaysOnLocation),
             buttonAuthorizationRequest: Content.ContentItem(title: state.labelGetAuthorization, value: "", action: .getAuthorizationButtonTapped),
             buttonLocationRequest: Content.ContentItem(title: state.labelGetLocation, value: "", action: .getPositionButtonTapped),
             locationInformation: Content.ContentItem(
                 title: state.labelPosition,
                 value: "Lat : " + state.location.coordinate.latitude.description + " ; Lon : " + state.location.coordinate.longitude.description
             ),
-            textAuthorization: Content.ContentItem(title: state.labelAuthorizationStatus, value: state.isAuthorized.description)
+            textAuthorization: Content.ContentItem(title: state.labelAuthorizationStatus, value:authStatus)
         )
     }
 }

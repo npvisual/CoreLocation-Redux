@@ -107,9 +107,9 @@ extension Content {
         let sectionSLCMonitoringTitle: String
         let sectionRegionMonitoringTitle: String
         let sectionBeaconRangingTitle: String
+        let toggleAuthType: ContentItem<Bool>
         let toggleLocationServices: ContentItem<Bool>
         let toggleSCLServices: ContentItem<Bool>
-        let toggleAuthType: ContentItem<Bool>
         let buttonAuthorizationRequest: ContentItem<String>
         let buttonLocationRequest: ContentItem<String>
         let locationInformation: ContentItem<String>
@@ -124,9 +124,9 @@ extension Content {
                 sectionSLCMonitoringTitle: "",
                 sectionRegionMonitoringTitle: "",
                 sectionBeaconRangingTitle: "",
+                toggleAuthType: Content.ContentItem(title: "", value: false),
                 toggleLocationServices: Content.ContentItem(title: "", value: false),
                 toggleSCLServices: Content.ContentItem(title: "", value: false),
-                toggleAuthType: Content.ContentItem(title: "", value: false),
                 buttonAuthorizationRequest: Content.ContentItem(title: "", value: ""),
                 buttonLocationRequest: Content.ContentItem(title: "", value: ""),
                 locationInformation: Content.ContentItem(title: "", value: ""),
