@@ -147,9 +147,14 @@ extension Reducer where ActionType == AppAction, StateType == AppState {
         switch action {
         case let .toggleLocationServices(status): state.isLocationEnabled = status
         case let .toggleAuthorizationType(status): state.authorizationType = status ? .always : .whenInUse
-        case let .lastKnownPosition(location): state.location = location
-        case let .triggerError(error): state.error = error.localizedDescription
-        case let .gotAuthorizationStatus(status): state.authorizationStatus = status
+        case let .lastKnownPosition(location):
+            state.location = location
+            state.error = ""
+        case let .triggerError(error):
+            state.error = error.localizedDescription
+            state.location = CLLocation()
+        case let .gotAuthorizationStatus(status):
+            state.authorizationStatus = status
         case .requestAuthorizationType,
              .requestPosition: break
         }
