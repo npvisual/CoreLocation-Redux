@@ -71,6 +71,13 @@ struct Content: View {
                         Text("Beacon Ranging")
                     }
                 }
+                Section(header:
+                            Text(viewModel.state.sectionDeviceCapabilitiesTitle)) {
+                    Text(viewModel.state.textIsSLCCapable.title + viewModel.state.textIsSLCCapable.value.description)
+                    Text(viewModel.state.textIsRegionMonitoringCapable.title + viewModel.state.textIsRegionMonitoringCapable.value.description)
+                    Text(viewModel.state.textIsRangingCapable.title + viewModel.state.textIsRangingCapable.value.description)
+                    Text(viewModel.state.textIsHeadingCapable.title + viewModel.state.textIsHeadingCapable.value.description)
+                }
             }
         }
     }
@@ -107,6 +114,7 @@ extension Content {
         let sectionSLCMonitoringTitle: String
         let sectionRegionMonitoringTitle: String
         let sectionBeaconRangingTitle: String
+        let sectionDeviceCapabilitiesTitle: String
         let toggleAuthType: ContentItem<Bool>
         let toggleLocationServices: ContentItem<Bool>
         let toggleSCLServices: ContentItem<Bool>
@@ -114,6 +122,10 @@ extension Content {
         let buttonLocationRequest: ContentItem<String>
         let locationInformation: ContentItem<String>
         let textAuthorization: ContentItem<String>
+        let textIsSLCCapable: ContentItem<Bool>
+        let textIsRegionMonitoringCapable: ContentItem<Bool>
+        let textIsRangingCapable: ContentItem<Bool>
+        let textIsHeadingCapable: ContentItem<Bool>
         
         
         static var empty: ViewState {
@@ -124,13 +136,18 @@ extension Content {
                 sectionSLCMonitoringTitle: "",
                 sectionRegionMonitoringTitle: "",
                 sectionBeaconRangingTitle: "",
+                sectionDeviceCapabilitiesTitle: "",
                 toggleAuthType: Content.ContentItem(title: "", value: false),
                 toggleLocationServices: Content.ContentItem(title: "", value: false),
                 toggleSCLServices: Content.ContentItem(title: "", value: false),
                 buttonAuthorizationRequest: Content.ContentItem(title: "", value: ""),
                 buttonLocationRequest: Content.ContentItem(title: "", value: ""),
                 locationInformation: Content.ContentItem(title: "", value: ""),
-                textAuthorization: Content.ContentItem(title: "", value: "")
+                textAuthorization: Content.ContentItem(title: "", value: ""),
+                textIsSLCCapable: Content.ContentItem(title: "", value: false),
+                textIsRegionMonitoringCapable: Content.ContentItem(title: "", value: false),
+                textIsRangingCapable: Content.ContentItem(title: "", value: false),
+                textIsHeadingCapable: Content.ContentItem(title: "", value: false)
             )
         }
     }

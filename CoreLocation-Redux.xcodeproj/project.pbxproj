@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8E0EE722251BA02C00FE24AB /* AppLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0EE721251BA02C00FE24AB /* AppLifecycle.swift */; };
+		8E0EE723251BA02C00FE24AB /* AppLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0EE721251BA02C00FE24AB /* AppLifecycle.swift */; };
+		8E0EE729251BA12500FE24AB /* ActionPrism.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0EE728251BA12400FE24AB /* ActionPrism.swift */; };
+		8E0EE72A251BA12500FE24AB /* ActionPrism.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0EE728251BA12400FE24AB /* ActionPrism.swift */; };
 		8EC902602512CF5100106B71 /* CoreLocationMiddleware in Frameworks */ = {isa = PBXBuildFile; productRef = 8EC9025F2512CF5100106B71 /* CoreLocationMiddleware */; };
 		8ECC811E25101DD200CC8427 /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC811D25101DD200CC8427 /* Tests_iOS.swift */; };
 		8ECC812925101DD200CC8427 /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC812825101DD200CC8427 /* Tests_macOS.swift */; };
@@ -41,6 +45,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8E0EE721251BA02C00FE24AB /* AppLifecycle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppLifecycle.swift; sourceTree = "<group>"; };
+		8E0EE728251BA12400FE24AB /* ActionPrism.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionPrism.swift; sourceTree = "<group>"; };
 		8ECC810225101DD000CC8427 /* CoreLocation_ReduxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreLocation_ReduxApp.swift; sourceTree = "<group>"; };
 		8ECC810325101DD000CC8427 /* Content.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Content.swift; sourceTree = "<group>"; };
 		8ECC810425101DD200CC8427 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -109,6 +115,8 @@
 		8ECC810125101DD000CC8427 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				8E0EE728251BA12400FE24AB /* ActionPrism.swift */,
+				8E0EE721251BA02C00FE24AB /* AppLifecycle.swift */,
 				8ECC810225101DD000CC8427 /* CoreLocation_ReduxApp.swift */,
 				8ECC810325101DD000CC8427 /* Content.swift */,
 				8ECC81482510294500CC8427 /* ReduxAppModule.swift */,
@@ -333,7 +341,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				8ECC812D25101DD200CC8427 /* Content.swift in Sources */,
+				8E0EE729251BA12500FE24AB /* ActionPrism.swift in Sources */,
 				8ECC812B25101DD200CC8427 /* CoreLocation_ReduxApp.swift in Sources */,
+				8E0EE722251BA02C00FE24AB /* AppLifecycle.swift in Sources */,
 				8ECC81492510294500CC8427 /* ReduxAppModule.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -343,7 +353,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				8ECC812E25101DD200CC8427 /* Content.swift in Sources */,
+				8E0EE72A251BA12500FE24AB /* ActionPrism.swift in Sources */,
 				8ECC812C25101DD200CC8427 /* CoreLocation_ReduxApp.swift in Sources */,
+				8E0EE723251BA02C00FE24AB /* AppLifecycle.swift in Sources */,
 				8ECC814A2510294500CC8427 /* ReduxAppModule.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
