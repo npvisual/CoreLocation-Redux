@@ -65,6 +65,7 @@ struct AppState: Equatable {
     let labelIsAvailableHeading = "Heading-related events : "
     let labelIsAvailableMonitoring = "Region Monitoring for CLCircularRegion : "
     let labelIsAvailableRanging = "Ranging for iBeacon : "
+    let labelErrorInformation = "Error : "
     
     // Application logic
     var isLocationEnabled: Bool
@@ -180,6 +181,7 @@ extension Reducer where ActionType == CoreLocationAction, StateType == AppState 
             state.location = CLLocation()
         case let .gotAuthorizationStatus(status):
             state.authorizationStatus = status
+            state.error = ""
         case let .gotDeviceCapabilities(capabilities):
             state.isSignificantLocationChangeCapable = capabilities.isSignificantLocationChangeAvailable
             state.isGPSCapable = capabilities.isHeadingAvailable
@@ -241,6 +243,7 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
                 title: state.labelPosition,
                 value: "Lat : " + state.location.coordinate.latitude.description + " ; Lon : " + state.location.coordinate.longitude.description
             ),
+            errorInformation: Content.ContentItem(title: state.labelErrorInformation, value: state.error),
             textAuthorization: Content.ContentItem(title: state.labelAuthorizationStatus, value:authStatus),
             textIsSLCCapable: Content.ContentItem(title: state.labelIsAvailableSLC, value: state.isSignificantLocationChangeCapable),
             textIsRegionMonitoringCapable: Content.ContentItem(title: state.labelIsAvailableMonitoring, value: state.isRegionMonitoringCapable),

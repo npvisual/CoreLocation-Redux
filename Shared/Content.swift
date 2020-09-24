@@ -38,6 +38,9 @@ struct Content: View {
                 }
                 Section {
                     Text(viewModel.state.locationInformation.title + viewModel.state.locationInformation.value)
+                    Text(viewModel.state.errorInformation.title + viewModel.state.errorInformation.value)
+                        .truncationMode(.tail)
+                        .allowsTightening(true)
                 }
                 Section(header: Text(viewModel.state.sectionLocationMonitoringTitle)) {
                     Toggle(
@@ -121,6 +124,7 @@ extension Content {
         let buttonAuthorizationRequest: ContentItem<String>
         let buttonLocationRequest: ContentItem<String>
         let locationInformation: ContentItem<String>
+        let errorInformation: ContentItem<String>
         let textAuthorization: ContentItem<String>
         let textIsSLCCapable: ContentItem<Bool>
         let textIsRegionMonitoringCapable: ContentItem<Bool>
@@ -143,6 +147,7 @@ extension Content {
                 buttonAuthorizationRequest: Content.ContentItem(title: "", value: ""),
                 buttonLocationRequest: Content.ContentItem(title: "", value: ""),
                 locationInformation: Content.ContentItem(title: "", value: ""),
+                errorInformation: Content.ContentItem(title: "", value: ""),
                 textAuthorization: Content.ContentItem(title: "", value: ""),
                 textIsSLCCapable: Content.ContentItem(title: "", value: false),
                 textIsRegionMonitoringCapable: Content.ContentItem(title: "", value: false),
