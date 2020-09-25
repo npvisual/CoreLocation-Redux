@@ -123,27 +123,27 @@ let appMiddleware = LoggerMiddleware<IdentityMiddleware<AppAction, AppAction, Ap
     .default() <> CoreLocationMiddleware().lift(
         inputActionMap: { globalAction in
             switch globalAction {
-            case .appLifecycle(.didBecomeActive): return LocationAction.requestDeviceCapabilities
+            case .appLifecycle(.didBecomeActive): return LocationAction.request(.requestDeviceCapabilities)
             case let .location(.toggleLocationServices(status)):
                 if status {
-                    return LocationAction.startMonitoring
+                    return LocationAction.request(.startMonitoring)
                 } else {
-                    return LocationAction.stopMonitoring
+                    return LocationAction.request(.stopMonitoring)
                 }
-            case .location(.requestPosition): return LocationAction.requestPosition
-            case .location(.requestAuthorizationType): return LocationAction.requestAuthorizationType
-            case .location(.requestDeviceCapabilities): return LocationAction.requestDeviceCapabilities
+            case .location(.requestPosition): return LocationAction.request(.requestPosition)
+            case .location(.requestAuthorizationType): return LocationAction.request(.requestAuthorizationType)
+            case .location(.requestDeviceCapabilities): return LocationAction.request(.requestDeviceCapabilities)
             default: return nil
             }
         },
         outputActionMap: { action in
             switch action {
-            case .startMonitoring: return .location(.toggleLocationServices(true))
-            case .stopMonitoring: return .location(.toggleLocationServices(false))
-            case let .gotAuthzStatus(status): return .location(.gotAuthorizationStatus(status))
-            case let .gotPosition(location): return .location(.lastKnownPosition(location))
-            case let .gotDeviceCapabilities(capabilities): return .location(.gotDeviceCapabilities(capabilities))
-            case let .receiveError(error): return .location(.triggerError(error))
+            case LocationAction.request(.startMonitoring): return .location(.toggleLocationServices(true))
+            case LocationAction.request(.stopMonitoring): return .location(.toggleLocationServices(false))
+            case let LocationAction.status(.gotAuthzStatus(status)): return .location(.gotAuthorizationStatus(status))
+            case let LocationAction.status(.gotPosition(location)): return .location(.lastKnownPosition(location))
+            case let LocationAction.status(.gotDeviceCapabilities(capabilities)): return .location(.gotDeviceCapabilities(capabilities))
+            case let LocationAction.status(.receiveError(error)): return .location(.triggerError(error))
             default: return .location(.toggleLocationServices(false))
             }
         },
