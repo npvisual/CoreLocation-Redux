@@ -28,7 +28,7 @@ struct Content: View {
                         onToggle: { ViewAction.toggleAuthType($0) }) {
                         Text(viewModel.state.toggleAuthType.title)
                     }
-                    Text("Authorization accuracy : Unknown")
+                    Text(viewModel.state.textAccuracy.title + viewModel.state.textAccuracy.value)
                     Button(
                         viewModel.state.buttonAuthorizationRequest.title.localizedCapitalized,
                         action: {
@@ -126,6 +126,7 @@ extension Content {
         let locationInformation: ContentItem<String>
         let errorInformation: ContentItem<String>
         let textAuthorization: ContentItem<String>
+        let textAccuracy: ContentItem<String>
         let textIsSLCCapable: ContentItem<Bool>
         let textIsRegionMonitoringCapable: ContentItem<Bool>
         let textIsRangingCapable: ContentItem<Bool>
@@ -149,6 +150,7 @@ extension Content {
                 locationInformation: Content.ContentItem(title: "", value: ""),
                 errorInformation: Content.ContentItem(title: "", value: ""),
                 textAuthorization: Content.ContentItem(title: "", value: ""),
+                textAccuracy: Content.ContentItem(title: "", value: ""),
                 textIsSLCCapable: Content.ContentItem(title: "", value: false),
                 textIsRegionMonitoringCapable: Content.ContentItem(title: "", value: false),
                 textIsRangingCapable: Content.ContentItem(title: "", value: false),

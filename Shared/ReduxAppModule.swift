@@ -21,7 +21,7 @@ enum AppAction {
 enum CoreLocationAction {
     case toggleLocationServices(Bool)
     case toggleAuthorizationType(Bool)
-    case gotAuthorizationStatus(CLAuthorizationStatus)
+    case gotAuthorizationStatus(AuthzStatus)
     case lastKnownPosition(CLLocation)
     case gotDeviceCapabilities(DeviceCapabilities)
     case requestAuthorizationType
@@ -55,6 +55,7 @@ struct AppState: Equatable {
     let labelAuthorizationStatus = "Authorization Status : "
     let labelGetAuthorization = "Request Authorization !"
     let labelPosition = "Position : "
+    let labelAccuracy = "Authorization accuracy : "
     let labelGetLocation = "Request Position !"
     let labelToggleLocationServices = "Monitor Location"
     let labelToggleSCLMonitoring = "Significant Location"
@@ -78,6 +79,7 @@ struct AppState: Equatable {
     
     var authorizationStatus: CLAuthorizationStatus = .notDetermined
     var authorizationType: AuthzType = .whenInUse
+    var authorizationAccuracy: CLAccuracyAuthorization? = .none
     var location: CLLocation = CLLocation()
     
     var error: String = ""
@@ -180,7 +182,8 @@ extension Reducer where ActionType == CoreLocationAction, StateType == AppState 
             state.error = error.localizedDescription
             state.location = CLLocation()
         case let .gotAuthorizationStatus(status):
-            state.authorizationStatus = status
+            state.authorizationStatus = status.status
+            state.authorizationAccuracy = status.accuracy
             state.error = ""
         case let .gotDeviceCapabilities(capabilities):
             state.isSignificantLocationChangeCapable = capabilities.isSignificantLocationChangeAvailable
@@ -217,6 +220,7 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
     private static func transform(from state: AppState) -> Content.ViewState {
         
         let authStatus: String
+        let authAccuracy: String
         
         switch state.authorizationStatus {
         case .authorizedAlways: authStatus = "Always"
@@ -225,6 +229,14 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
         case .restricted: authStatus = "Restricted"
         default: authStatus = "Unknown"
         }
+        
+        switch state.authorizationAccuracy {
+        case .fullAccuracy: authAccuracy = "Full"
+        case .reducedAccuracy: authAccuracy = "Reduced"
+        case .none: authAccuracy = "N/A"
+        @unknown default: authAccuracy = "Unknown"
+        }
+        
         
         return Content.ViewState(
             titleView: state.appTitle,
@@ -245,6 +257,7 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
             ),
             errorInformation: Content.ContentItem(title: state.labelErrorInformation, value: state.error),
             textAuthorization: Content.ContentItem(title: state.labelAuthorizationStatus, value:authStatus),
+            textAccuracy: Content.ContentItem(title: state.labelAccuracy, value: authAccuracy),
             textIsSLCCapable: Content.ContentItem(title: state.labelIsAvailableSLC, value: state.isSignificantLocationChangeCapable),
             textIsRegionMonitoringCapable: Content.ContentItem(title: state.labelIsAvailableMonitoring, value: state.isRegionMonitoringCapable),
             textIsRangingCapable: Content.ContentItem(title: state.labelIsAvailableRanging, value: state.isRangingCapable),
