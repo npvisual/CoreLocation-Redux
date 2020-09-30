@@ -237,8 +237,6 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
     
     private static func transform(_ viewAction: Content.ViewAction) -> AppAction? {
         switch viewAction {
-        case let .toggleLocationMonitoring(value): return .location(.toggleLocationServices(value))
-        case let .toggleSLCMonitoring(value): return .location(.toggleSLCMonitoring(value))
         case let .toggleHeadingServices(value): return .location(.toggleHeadingUpdates(value))
         case .getPositionButtonTapped: return .location(.requestPosition)
         }
@@ -249,12 +247,10 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
         return Content.ViewState(
             titleView: state.appTitle,
             sectionLocationMonitoringTitle: state.titleLocationServices,
-            sectionSLCMonitoringTitle: state.titleSLCServices,
             sectionHeadingUpdatesTitle: state.titleHeadingMonitoring,
             sectionRegionMonitoringTitle: state.titleRegionMonitoring,
             sectionBeaconRangingTitle: state.titleBeaconRanging,
             toggleLocationServices: Content.ContentItem(title: state.labelToggleLocationServices, value: state.isLocationEnabled),
-            toggleSCLServices: Content.ContentItem(title: state.titleSLCServices, value: state.isSLCEnabled),
             toggleHeadingServices: Content.ContentItem(title: state.titleHeadingMonitoring, value: state.isHeadingEnabled),
             buttonLocationRequest: Content.ContentItem(title: state.labelGetLocation, value: "", action: .getPositionButtonTapped)
         )
@@ -374,6 +370,29 @@ extension ObservableViewModel where ViewAction == SectionInformation.ViewAction,
     }
 }
 
+extension ObservableViewModel where ViewAction == SectionSLCMonitoring.ViewAction, ViewState == SectionSLCMonitoring.ViewState {
+    static func slcSection<S: StoreType>(store: S) -> ObservableViewModel
+    where S.ActionType == AppAction, S.StateType == AppState {
+        return store
+            .projection(action: Self.transform, state: Self.transform)
+            .asObservableViewModel(initialState: .empty)
+    }
+    
+    private static func transform(_ viewAction: SectionSLCMonitoring.ViewAction) -> AppAction? {
+        switch viewAction {
+        case let .toggleSLCMonitoring(value): return .location(.toggleSLCMonitoring(value))
+        }
+    }
+    
+    private static func transform(from state: AppState) -> SectionSLCMonitoring.ViewState {
+        
+        return SectionSLCMonitoring.ViewState(
+            sectionSLCMonitoringTitle: state.titleSLCServices,
+            toggleSCLServices: SectionSLCMonitoring.ContentItem(title: state.labelToggleSCLMonitoring, value: state.isSLCEnabled)
+        )
+    }
+}
+
 // MARK: - VIEW PRODUCERS
 extension ViewProducer where Context == Void, ProducedView == Content {
     static func content<S: StoreType>(store: S) -> ViewProducer
@@ -384,6 +403,7 @@ extension ViewProducer where Context == Void, ProducedView == Content {
                 authzSectionProducer: .authzSection(store: store),
                 locationSectionProducer: .locationSection(store: store),
                 informationSectionProducer: .informationSection(store: store),
+                slcSectionProducer: .slcSection(store: store),
                 capabilitiesSectionProducer: .capabilitiesSection(store: store)
             )
         }
@@ -422,6 +442,15 @@ extension ViewProducer where Context == Void, ProducedView == SectionInformation
     where S.ActionType == AppAction, S.StateType == AppState {
         ViewProducer {
             SectionInformation(viewModel: .informationSection(store: store))
+        }
+    }
+}
+
+extension ViewProducer where Context == Void, ProducedView == SectionSLCMonitoring {
+    static func slcSection<S: StoreType>(store: S) -> ViewProducer
+    where S.ActionType == AppAction, S.StateType == AppState {
+        ViewProducer {
+            SectionSLCMonitoring(viewModel: .slcSection(store: store))
         }
     }
 }

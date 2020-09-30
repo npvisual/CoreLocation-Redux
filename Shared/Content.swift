@@ -16,6 +16,7 @@ struct Content: View {
     let authzSectionProducer: ViewProducer<Void, SectionAuthorization>
     let locationSectionProducer: ViewProducer<Void, SectionLocationMonitoring>
     let informationSectionProducer: ViewProducer<Void, SectionInformation>
+    let slcSectionProducer: ViewProducer<Void, SectionSLCMonitoring>
     let capabilitiesSectionProducer: ViewProducer<Void, SectionDeviceCapabilities>
     
     var body: some View {
@@ -27,14 +28,7 @@ struct Content: View {
                 authzSectionProducer.view()
                 locationSectionProducer.view()
                 informationSectionProducer.view()
-                Section(header: Text(viewModel.state.sectionSLCMonitoringTitle)) {
-                    Toggle(
-                        viewModel: viewModel,
-                        state: \.toggleSCLServices.value,
-                        onToggle: { ViewAction.toggleSLCMonitoring($0) }) {
-                        Text(viewModel.state.toggleSCLServices.title)
-                    }
-                }
+                slcSectionProducer.view()
                 Section(header: Text(viewModel.state.sectionHeadingUpdatesTitle)) {
                     Toggle(
                         viewModel: viewModel,
@@ -72,6 +66,7 @@ struct Content_Previews: PreviewProvider {
     static let mockAuthzSectionProducer = ViewProducer.authzSection(store: mockStore)
     static let mockLocationSectionProducer = ViewProducer.locationSection(store: mockStore)
     static let mockInformationSectionProducer = ViewProducer.informationSection(store: mockStore)
+    static let mockSLCSectionProducer = ViewProducer.slcSection(store: mockStore)
     static let mockCapabilitiesSectionProducer = ViewProducer.capabilitiesSection(store: mockStore)
     
     static var previews: some View {
@@ -80,6 +75,7 @@ struct Content_Previews: PreviewProvider {
             authzSectionProducer: mockAuthzSectionProducer,
             locationSectionProducer: mockLocationSectionProducer,
             informationSectionProducer: mockInformationSectionProducer,
+            slcSectionProducer: mockSLCSectionProducer,
             capabilitiesSectionProducer: mockCapabilitiesSectionProducer
         )
     }
@@ -87,8 +83,6 @@ struct Content_Previews: PreviewProvider {
 
 extension Content {
     enum ViewAction: Equatable {
-        case toggleLocationMonitoring(Bool)
-        case toggleSLCMonitoring(Bool)
         case toggleHeadingServices(Bool)
         case getPositionButtonTapped
     }
@@ -96,12 +90,10 @@ extension Content {
     struct ViewState: Equatable {
         let titleView: String
         let sectionLocationMonitoringTitle: String
-        let sectionSLCMonitoringTitle: String
         let sectionHeadingUpdatesTitle: String
         let sectionRegionMonitoringTitle: String
         let sectionBeaconRangingTitle: String
         let toggleLocationServices: ContentItem<Bool>
-        let toggleSCLServices: ContentItem<Bool>
         let toggleHeadingServices: ContentItem<Bool>
         let buttonLocationRequest: ContentItem<String>
         
@@ -109,12 +101,10 @@ extension Content {
             .init(
                 titleView: "",
                 sectionLocationMonitoringTitle: "",
-                sectionSLCMonitoringTitle: "",
                 sectionHeadingUpdatesTitle: "",
                 sectionRegionMonitoringTitle: "",
                 sectionBeaconRangingTitle: "",
                 toggleLocationServices: ContentItem(title: "", value: false),
-                toggleSCLServices: ContentItem(title: "", value: false),
                 toggleHeadingServices: ContentItem(title: "", value: false),
                 buttonLocationRequest: ContentItem(title: "", value: "")
             )

@@ -33,6 +33,8 @@
 		8EE00261251E8C26002C5F12 /* SectionAuthorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE0025F251E8C26002C5F12 /* SectionAuthorization.swift */; };
 		8EE3B75E252521AF0010F6B4 /* SectionInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE3B75D252521AF0010F6B4 /* SectionInformation.swift */; };
 		8EE3B75F252521AF0010F6B4 /* SectionInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE3B75D252521AF0010F6B4 /* SectionInformation.swift */; };
+		8EE3B7652525292F0010F6B4 /* SectionSLCMonitoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE3B7642525292F0010F6B4 /* SectionSLCMonitoring.swift */; };
+		8EE3B7662525292F0010F6B4 /* SectionSLCMonitoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE3B7642525292F0010F6B4 /* SectionSLCMonitoring.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,6 +76,7 @@
 		8ECC81482510294500CC8427 /* ReduxAppModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReduxAppModule.swift; sourceTree = "<group>"; };
 		8EE0025F251E8C26002C5F12 /* SectionAuthorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionAuthorization.swift; sourceTree = "<group>"; };
 		8EE3B75D252521AF0010F6B4 /* SectionInformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionInformation.swift; sourceTree = "<group>"; };
+		8EE3B7642525292F0010F6B4 /* SectionSLCMonitoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionSLCMonitoring.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +140,7 @@
 				8E76E2C3252385E900229344 /* SectionLocationMonitoring.swift */,
 				8E76E2CA252388A600229344 /* SectionDeviceCapabilities.swift */,
 				8EE3B75D252521AF0010F6B4 /* SectionInformation.swift */,
+				8EE3B7642525292F0010F6B4 /* SectionSLCMonitoring.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -356,6 +360,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8EE3B7652525292F0010F6B4 /* SectionSLCMonitoring.swift in Sources */,
 				8ECC812D25101DD200CC8427 /* Content.swift in Sources */,
 				8E76E2CB252388A600229344 /* SectionDeviceCapabilities.swift in Sources */,
 				8E0EE729251BA12500FE24AB /* ActionPrism.swift in Sources */,
@@ -372,6 +377,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8EE3B7662525292F0010F6B4 /* SectionSLCMonitoring.swift in Sources */,
 				8ECC812E25101DD200CC8427 /* Content.swift in Sources */,
 				8E76E2CC252388A600229344 /* SectionDeviceCapabilities.swift in Sources */,
 				8E0EE72A251BA12500FE24AB /* ActionPrism.swift in Sources */,
