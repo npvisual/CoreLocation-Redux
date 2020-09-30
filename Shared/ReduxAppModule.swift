@@ -21,6 +21,7 @@ enum AppAction {
 enum CoreLocationAction {
     case toggleLocationServices(Bool)
     case toggleAuthorizationType(Bool)
+    case toggleSLCMonitoring(Bool)
     case gotAuthorizationStatus(AuthzStatus)
     case lastKnownPosition(CLLocation)
     case gotDeviceCapabilities(DeviceCapabilities)
@@ -32,10 +33,10 @@ enum CoreLocationAction {
 
 struct AppState: Equatable {
     
-    // App lifecycle
+    // MARK: - App lifecycle
     var appLifecycle: AppLifecycle = .backgroundInactive
     
-    // Static content
+    // MARK: - Static content
     
     // App related content
     let appTitle = "CoreLocation with Redux !"
@@ -68,18 +69,23 @@ struct AppState: Equatable {
     let labelIsAvailableRanging = "Ranging for iBeacon : "
     let labelErrorInformation = "Error : "
     
-    // Application logic
+    // MARK: - Application logic
+    
+    // Service status
+    var isAuthorized: Bool = false
     var isLocationEnabled: Bool
+    var isSLCEnabled: Bool = false
+    // Device Capabilities
     var isSignificantLocationChangeCapable: Bool = false
     var isRegionMonitoringCapable: Bool = false
     var isRangingCapable: Bool = false
     var isGPSCapable: Bool = false                          // Heading capability
     var isLocationServiceCapable: Bool = false
-    var isAuthorized: Bool = false
-    
+    // Authorization data
     var authorizationStatus: CLAuthorizationStatus = .notDetermined
     var authorizationType: AuthzType = .whenInUse
     var authorizationAccuracy: CLAccuracyAuthorization? = .none
+    // Location data
     var location: CLLocation = CLLocation()
     
     var error: String = ""
@@ -123,27 +129,33 @@ let appMiddleware = LoggerMiddleware<IdentityMiddleware<AppAction, AppAction, Ap
     .default() <> CoreLocationMiddleware().lift(
         inputActionMap: { globalAction in
             switch globalAction {
-            case .appLifecycle(.didBecomeActive): return LocationAction.request(.requestDeviceCapabilities)
+            case .appLifecycle(.didBecomeActive): return .request(.requestDeviceCapabilities)
             case let .location(.toggleLocationServices(status)):
                 if status {
-                    return LocationAction.request(.startMonitoring)
+                    return .request(.start(.locationMonitoring))
                 } else {
-                    return LocationAction.request(.stopMonitoring)
+                    return .request(.stop(.locationMonitoring))
                 }
-            case .location(.requestPosition): return LocationAction.request(.requestPosition)
-            case .location(.requestAuthorizationType): return LocationAction.request(.requestAuthorizationType)
-            case .location(.requestDeviceCapabilities): return LocationAction.request(.requestDeviceCapabilities)
+            case let .location(.toggleSLCMonitoring(status)):
+                if status {
+                    return .request(.start(.slcMonitoring))
+                } else {
+                    return .request(.stop(.slcMonitoring))
+                }
+            case .location(.requestPosition): return .request(.requestPosition)
+            case .location(.requestAuthorizationType): return .request(.requestAuthorizationType)
+            case .location(.requestDeviceCapabilities): return .request(.requestDeviceCapabilities)
             default: return nil
             }
         },
         outputActionMap: { action in
             switch action {
-            case LocationAction.request(.startMonitoring): return .location(.toggleLocationServices(true))
-            case LocationAction.request(.stopMonitoring): return .location(.toggleLocationServices(false))
-            case let LocationAction.status(.gotAuthzStatus(status)): return .location(.gotAuthorizationStatus(status))
-            case let LocationAction.status(.gotPosition(location)): return .location(.lastKnownPosition(location))
-            case let LocationAction.status(.gotDeviceCapabilities(capabilities)): return .location(.gotDeviceCapabilities(capabilities))
-            case let LocationAction.status(.receiveError(error)): return .location(.triggerError(error))
+            case .request(.start(.locationMonitoring)): return .location(.toggleLocationServices(true))
+            case .request(.stop(.locationMonitoring)): return .location(.toggleLocationServices(false))
+            case let .status(.gotAuthzStatus(status)): return .location(.gotAuthorizationStatus(status))
+            case let .status(.gotPosition(location)): return .location(.lastKnownPosition(location))
+            case let .status(.gotDeviceCapabilities(capabilities)): return .location(.gotDeviceCapabilities(capabilities))
+            case let .status(.receiveError(error)): return .location(.triggerError(error))
             default: return .location(.toggleLocationServices(false))
             }
         },
@@ -175,6 +187,7 @@ extension Reducer where ActionType == CoreLocationAction, StateType == AppState 
         switch action {
         case let .toggleLocationServices(status): state.isLocationEnabled = status
         case let .toggleAuthorizationType(status): state.authorizationType = status ? .always : .whenInUse
+        case let .toggleSLCMonitoring(status): state.isSLCEnabled = status
         case let .lastKnownPosition(location):
             state.location = location
             state.error = ""
@@ -210,15 +223,48 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
     
     private static func transform(_ viewAction: Content.ViewAction) -> AppAction? {
         switch viewAction {
-        case .toggleAuthType(let value): return .location(.toggleAuthorizationType(value))
         case .toggleLocationMonitoring(let value): return .location(.toggleLocationServices(value))
+        case .toggleSLCMonitoring(let value): return .location(.toggleSLCMonitoring(value))
         case .getPositionButtonTapped: return .location(.requestPosition)
-        case .getAuthorizationButtonTapped: return .location(.requestAuthorizationType)
         }
     }
     
     private static func transform(from state: AppState) -> Content.ViewState {
         
+        return Content.ViewState(
+            titleView: state.appTitle,
+            sectionLocationMonitoringTitle: state.titleLocationServices,
+            sectionSLCMonitoringTitle: state.titleSLCServices,
+            sectionRegionMonitoringTitle: state.titleRegionMonitoring,
+            sectionBeaconRangingTitle: state.titleBeaconRanging,
+            toggleLocationServices: Content.ContentItem(title: state.labelToggleLocationServices, value: state.isLocationEnabled),
+            toggleSCLServices: Content.ContentItem(title: state.titleSLCServices, value: state.isSLCEnabled),
+            buttonLocationRequest: Content.ContentItem(title: state.labelGetLocation, value: "", action: .getPositionButtonTapped),
+            locationInformation: Content.ContentItem(
+                title: state.labelPosition,
+                value: "Lat : " + state.location.coordinate.latitude.description + " ; Lon : " + state.location.coordinate.longitude.description
+            ),
+            errorInformation: Content.ContentItem(title: state.labelErrorInformation, value: state.error)
+        )
+    }
+}
+
+extension ObservableViewModel where ViewAction == SectionAuthorization.ViewAction, ViewState == SectionAuthorization.ViewState {
+    static func authzSection<S: StoreType>(store: S) -> ObservableViewModel
+    where S.ActionType == AppAction, S.StateType == AppState {
+        return store
+            .projection(action: Self.transform, state: Self.transform)
+            .asObservableViewModel(initialState: .empty)
+    }
+    
+    private static func transform(_ viewAction: SectionAuthorization.ViewAction) -> AppAction? {
+        switch viewAction {
+        case .toggleAuthType(let value): return .location(.toggleAuthorizationType(value))
+        case .getAuthorizationButtonTapped: return .location(.requestAuthorizationType)
+        }
+    }
+    
+    private static func transform(from state: AppState) -> SectionAuthorization.ViewState {
         let authStatus: String
         let authAccuracy: String
         
@@ -236,42 +282,101 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
         case .none: authAccuracy = "N/A"
         @unknown default: authAccuracy = "Unknown"
         }
-        
-        
-        return Content.ViewState(
-            titleView: state.appTitle,
+
+        return SectionAuthorization.ViewState(
             sectionAuthorizationTitle: state.titleAuthorization,
-            sectionLocationMonitoringTitle: state.titleLocationServices,
-            sectionSLCMonitoringTitle: state.titleSLCServices,
-            sectionRegionMonitoringTitle: state.titleRegionMonitoring,
-            sectionBeaconRangingTitle: state.titleBeaconRanging,
-            sectionDeviceCapabilitiesTitle: state.titleDeviceCapabilities,
-            toggleAuthType: Content.ContentItem(title: state.labelToggleAuthType, value: [AuthzType.always].contains(state.authorizationType)),
-            toggleLocationServices: Content.ContentItem(title: state.labelToggleLocationServices, value: state.isLocationEnabled),
-            toggleSCLServices: Content.ContentItem(title: state.titleSLCServices, value: false),
-            buttonAuthorizationRequest: Content.ContentItem(title: state.labelGetAuthorization, value: "", action: .getAuthorizationButtonTapped),
-            buttonLocationRequest: Content.ContentItem(title: state.labelGetLocation, value: "", action: .getPositionButtonTapped),
-            locationInformation: Content.ContentItem(
-                title: state.labelPosition,
-                value: "Lat : " + state.location.coordinate.latitude.description + " ; Lon : " + state.location.coordinate.longitude.description
-            ),
-            errorInformation: Content.ContentItem(title: state.labelErrorInformation, value: state.error),
-            textAuthorization: Content.ContentItem(title: state.labelAuthorizationStatus, value:authStatus),
-            textAccuracy: Content.ContentItem(title: state.labelAccuracy, value: authAccuracy),
-            textIsSLCCapable: Content.ContentItem(title: state.labelIsAvailableSLC, value: state.isSignificantLocationChangeCapable),
-            textIsRegionMonitoringCapable: Content.ContentItem(title: state.labelIsAvailableMonitoring, value: state.isRegionMonitoringCapable),
-            textIsRangingCapable: Content.ContentItem(title: state.labelIsAvailableRanging, value: state.isRangingCapable),
-            textIsHeadingCapable: Content.ContentItem(title: state.labelIsAvailableHeading, value: state.isGPSCapable)
+            toggleAuthType: SectionAuthorization.ContentItem(title: state.labelToggleAuthType, value: [AuthzType.always].contains(state.authorizationType)),
+            buttonAuthorizationRequest: SectionAuthorization.ContentItem(title: state.labelGetAuthorization, value: "", action: .getAuthorizationButtonTapped),
+            textAuthorization: SectionAuthorization.ContentItem(title: state.labelAuthorizationStatus, value:authStatus),
+            textAccuracy: SectionAuthorization.ContentItem(title: state.labelAccuracy, value: authAccuracy)
         )
     }
 }
+
+extension ObservableViewModel where ViewAction == SectionLocationMonitoring.ViewAction, ViewState == SectionLocationMonitoring.ViewState {
+    static func locationSection<S: StoreType>(store: S) -> ObservableViewModel
+    where S.ActionType == AppAction, S.StateType == AppState {
+        return store
+            .projection(action: Self.transform, state: Self.transform)
+            .asObservableViewModel(initialState: .empty)
+    }
+    
+    private static func transform(_ viewAction: SectionLocationMonitoring.ViewAction) -> AppAction? {
+        switch viewAction {
+        case .toggleLocationMonitoring(let value): return .location(.toggleLocationServices(value))
+        case .getPositionButtonTapped: return .location(.requestPosition)
+        }
+    }
+    
+    private static func transform(from state: AppState) -> SectionLocationMonitoring.ViewState {
+        
+        return SectionLocationMonitoring.ViewState(
+            sectionLocationMonitoringTitle: state.titleLocationServices,
+            toggleLocationServices: SectionLocationMonitoring.ContentItem(title: state.labelToggleLocationServices, value: state.isLocationEnabled),
+            buttonLocationRequest: SectionLocationMonitoring.ContentItem(title: state.labelGetLocation, value: "", action: .getPositionButtonTapped)
+        )
+    }
+}
+
+extension ObservableViewModel where ViewAction == SectionDeviceCapabilities.ViewAction, ViewState == SectionDeviceCapabilities.ViewState {
+    static func capabilitiesSection<S: StoreType>(store: S) -> ObservableViewModel
+    where S.ActionType == AppAction, S.StateType == AppState {
+        return store
+            .projection(action: { _ in nil }, state: Self.transform)
+            .asObservableViewModel(initialState: .empty)
+    }
+        
+    private static func transform(from state: AppState) -> SectionDeviceCapabilities.ViewState {
+        
+        return SectionDeviceCapabilities.ViewState(
+            sectionDeviceCapabilitiesTitle: state.titleDeviceCapabilities,
+            textIsSLCCapable: SectionDeviceCapabilities.ContentItem(title: state.labelIsAvailableSLC, value: state.isSignificantLocationChangeCapable),
+            textIsRegionMonitoringCapable: SectionDeviceCapabilities.ContentItem(title: state.labelIsAvailableMonitoring, value: state.isRegionMonitoringCapable),
+            textIsRangingCapable: SectionDeviceCapabilities.ContentItem(title: state.labelIsAvailableRanging, value: state.isRangingCapable),
+            textIsHeadingCapable: SectionDeviceCapabilities.ContentItem(title: state.labelIsAvailableHeading, value: state.isGPSCapable)
+        )
+    }
+}
+
 
 // MARK: - VIEW PRODUCERS
 extension ViewProducer where Context == Void, ProducedView == Content {
     static func content<S: StoreType>(store: S) -> ViewProducer
     where S.ActionType == AppAction, S.StateType == AppState {
         ViewProducer {
-            Content(viewModel: .content(store: store))
+            Content(
+                viewModel: .content(store: store),
+                authzSectionProducer: .authzSection(store: store),
+                locationSectionProducer: .locationSection(store: store),
+                capabilitiesSectionProducer: .capabilitiesSection(store: store)
+            )
+        }
+    }
+}
+
+extension ViewProducer where Context == Void, ProducedView == SectionAuthorization {
+    static func authzSection<S: StoreType>(store: S) -> ViewProducer
+    where S.ActionType == AppAction, S.StateType == AppState {
+        ViewProducer {
+            SectionAuthorization(viewModel: .authzSection(store: store))
+        }
+    }
+}
+
+extension ViewProducer where Context == Void, ProducedView == SectionLocationMonitoring {
+    static func locationSection<S: StoreType>(store: S) -> ViewProducer
+    where S.ActionType == AppAction, S.StateType == AppState {
+        ViewProducer {
+            SectionLocationMonitoring(viewModel: .locationSection(store: store))
+        }
+    }
+}
+
+extension ViewProducer where Context == Void, ProducedView == SectionDeviceCapabilities {
+    static func capabilitiesSection<S: StoreType>(store: S) -> ViewProducer
+    where S.ActionType == AppAction, S.StateType == AppState {
+        ViewProducer {
+            SectionDeviceCapabilities(viewModel: .capabilitiesSection(store: store))
         }
     }
 }

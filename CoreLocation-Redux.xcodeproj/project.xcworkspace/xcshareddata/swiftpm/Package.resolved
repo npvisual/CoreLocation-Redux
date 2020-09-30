@@ -15,7 +15,7 @@
         "repositoryURL": "https://github.com/SwiftRex/CoreLocationMiddleware",
         "state": {
           "branch": "development",
-          "revision": "612173b44996ca35addd6c7486fe632c06585a1b",
+          "revision": "1dff5f5084857330a88d5d91fa060365b03e7764",
           "version": null
         }
       },
@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/ReactiveCocoa/ReactiveSwift.git",
         "state": {
           "branch": null,
-          "revision": "3f4351d04115fd8797802d9b2d17b812cd761602",
-          "version": "6.3.0"
+          "revision": "2260221e19eb024382a1b20cdd2c8adc4f48f8b8",
+          "version": "6.4.0"
         }
       },
       {
