@@ -83,7 +83,7 @@ struct AppState: Equatable {
     var isSignificantLocationChangeCapable: Bool = false
     var isRegionMonitoringCapable: Bool = false
     var isRangingCapable: Bool = false
-    var isGPSCapable: Bool = false                          // Heading capability
+    var isHeadingCapable: Bool = false
     var isLocationServiceCapable: Bool = false
     // Authorization data
     var authorizationStatus: CLAuthorizationStatus = .notDetermined
@@ -214,7 +214,7 @@ extension Reducer where ActionType == CoreLocationAction, StateType == AppState 
             state.error = ""
         case let .gotDeviceCapabilities(capabilities):
             state.isSignificantLocationChangeCapable = capabilities.isSignificantLocationChangeAvailable
-            state.isGPSCapable = capabilities.isHeadingAvailable
+            state.isHeadingCapable = capabilities.isHeadingAvailable
             state.isRegionMonitoringCapable = capabilities.isRegionMonitoringAvailable
             state.isRangingCapable = capabilities.isRangingAvailable
             state.isLocationServiceCapable = capabilities.isLocationServiceAvailable
@@ -237,7 +237,6 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
     
     private static func transform(_ viewAction: Content.ViewAction) -> AppAction? {
         switch viewAction {
-        case let .toggleHeadingServices(value): return .location(.toggleHeadingUpdates(value))
         case .getPositionButtonTapped: return .location(.requestPosition)
         }
     }
@@ -246,12 +245,8 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
         
         return Content.ViewState(
             titleView: state.appTitle,
-            sectionLocationMonitoringTitle: state.titleLocationServices,
-            sectionHeadingUpdatesTitle: state.titleHeadingMonitoring,
             sectionRegionMonitoringTitle: state.titleRegionMonitoring,
             sectionBeaconRangingTitle: state.titleBeaconRanging,
-            toggleLocationServices: Content.ContentItem(title: state.labelToggleLocationServices, value: state.isLocationEnabled),
-            toggleHeadingServices: Content.ContentItem(title: state.titleHeadingMonitoring, value: state.isHeadingEnabled),
             buttonLocationRequest: Content.ContentItem(title: state.labelGetLocation, value: "", action: .getPositionButtonTapped)
         )
     }
@@ -341,7 +336,7 @@ extension ObservableViewModel where ViewAction == SectionDeviceCapabilities.View
             textIsSLCCapable: SectionDeviceCapabilities.ContentItem(title: state.labelIsAvailableSLC, value: state.isSignificantLocationChangeCapable),
             textIsRegionMonitoringCapable: SectionDeviceCapabilities.ContentItem(title: state.labelIsAvailableMonitoring, value: state.isRegionMonitoringCapable),
             textIsRangingCapable: SectionDeviceCapabilities.ContentItem(title: state.labelIsAvailableRanging, value: state.isRangingCapable),
-            textIsHeadingCapable: SectionDeviceCapabilities.ContentItem(title: state.labelIsAvailableHeading, value: state.isGPSCapable)
+            textIsHeadingCapable: SectionDeviceCapabilities.ContentItem(title: state.labelIsAvailableHeading, value: state.isHeadingCapable)
         )
     }
 }
@@ -393,6 +388,32 @@ extension ObservableViewModel where ViewAction == SectionSLCMonitoring.ViewActio
     }
 }
 
+extension ObservableViewModel where ViewAction == SectionHeadingUpdates.ViewAction, ViewState == SectionHeadingUpdates.ViewState {
+    static func headingSection<S: StoreType>(store: S) -> ObservableViewModel
+    where S.ActionType == AppAction, S.StateType == AppState {
+        return store
+            .projection(action: Self.transform, state: Self.transform)
+            .asObservableViewModel(initialState: .empty)
+    }
+    
+    private static func transform(_ viewAction: SectionHeadingUpdates.ViewAction) -> AppAction? {
+        switch viewAction {
+        case let .toggleHeadingServices(value): return .location(.toggleHeadingUpdates(value))
+        }
+    }
+    
+    private static func transform(from state: AppState) -> SectionHeadingUpdates.ViewState {
+        
+        return SectionHeadingUpdates.ViewState(
+            sectionHeadingUpdatesTitle: state.titleHeadingMonitoring,
+            toggleHeadingServices: SectionHeadingUpdates.ContentItem(
+                title: state.labelHeading,
+                value: state.isHeadingEnabled
+            )
+        )
+    }
+}
+
 // MARK: - VIEW PRODUCERS
 extension ViewProducer where Context == Void, ProducedView == Content {
     static func content<S: StoreType>(store: S) -> ViewProducer
@@ -404,6 +425,7 @@ extension ViewProducer where Context == Void, ProducedView == Content {
                 locationSectionProducer: .locationSection(store: store),
                 informationSectionProducer: .informationSection(store: store),
                 slcSectionProducer: .slcSection(store: store),
+                headingSectionProducer: .headingSection(store: store),
                 capabilitiesSectionProducer: .capabilitiesSection(store: store)
             )
         }
@@ -451,6 +473,15 @@ extension ViewProducer where Context == Void, ProducedView == SectionSLCMonitori
     where S.ActionType == AppAction, S.StateType == AppState {
         ViewProducer {
             SectionSLCMonitoring(viewModel: .slcSection(store: store))
+        }
+    }
+}
+
+extension ViewProducer where Context == Void, ProducedView == SectionHeadingUpdates {
+    static func headingSection<S: StoreType>(store: S) -> ViewProducer
+    where S.ActionType == AppAction, S.StateType == AppState {
+        ViewProducer {
+            SectionHeadingUpdates(viewModel: .headingSection(store: store))
         }
     }
 }
