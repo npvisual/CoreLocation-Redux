@@ -22,8 +22,10 @@ enum CoreLocationAction {
     case toggleLocationServices(Bool)
     case toggleAuthorizationType(Bool)
     case toggleSLCMonitoring(Bool)
+    case toggleHeadingUpdates(Bool)
     case gotAuthorizationStatus(AuthzStatus)
     case lastKnownPosition(CLLocation)
+    case lastKnownHeading(CLHeading)
     case gotDeviceCapabilities(DeviceCapabilities)
     case requestAuthorizationType
     case requestPosition
@@ -56,6 +58,7 @@ struct AppState: Equatable {
     let labelAuthorizationStatus = "Authorization Status : "
     let labelGetAuthorization = "Request Authorization !"
     let labelPosition = "Position : "
+    let labelHeading = "Heading : "
     let labelAccuracy = "Authorization accuracy : "
     let labelGetLocation = "Request Position !"
     let labelToggleLocationServices = "Monitor Location"
@@ -75,6 +78,7 @@ struct AppState: Equatable {
     var isAuthorized: Bool = false
     var isLocationEnabled: Bool
     var isSLCEnabled: Bool = false
+    var isHeadingEnabled: Bool = false
     // Device Capabilities
     var isSignificantLocationChangeCapable: Bool = false
     var isRegionMonitoringCapable: Bool = false
@@ -87,6 +91,7 @@ struct AppState: Equatable {
     var authorizationAccuracy: CLAccuracyAuthorization? = .none
     // Location data
     var location: CLLocation = CLLocation()
+    var heading: CLHeading? = nil
     
     var error: String = ""
     
@@ -142,6 +147,12 @@ let appMiddleware = LoggerMiddleware<IdentityMiddleware<AppAction, AppAction, Ap
                 } else {
                     return .request(.stop(.slcMonitoring))
                 }
+            case let .location(.toggleHeadingUpdates(status)):
+                if status {
+                    return .request(.start(.headingUpdates))
+                } else {
+                    return .request(.stop(.headingUpdates))
+                }
             case .location(.requestPosition): return .request(.requestPosition)
             case .location(.requestAuthorizationType): return .request(.requestAuthorizationType)
             case .location(.requestDeviceCapabilities): return .request(.requestDeviceCapabilities)
@@ -150,10 +161,9 @@ let appMiddleware = LoggerMiddleware<IdentityMiddleware<AppAction, AppAction, Ap
         },
         outputActionMap: { action in
             switch action {
-            case .request(.start(.locationMonitoring)): return .location(.toggleLocationServices(true))
-            case .request(.stop(.locationMonitoring)): return .location(.toggleLocationServices(false))
             case let .status(.gotAuthzStatus(status)): return .location(.gotAuthorizationStatus(status))
             case let .status(.gotPosition(location)): return .location(.lastKnownPosition(location))
+            case let .status(.gotHeading(heading)): return .location(.lastKnownHeading(heading))
             case let .status(.gotDeviceCapabilities(capabilities)): return .location(.gotDeviceCapabilities(capabilities))
             case let .status(.receiveError(error)): return .location(.triggerError(error))
             default: return .location(.toggleLocationServices(false))
@@ -188,8 +198,12 @@ extension Reducer where ActionType == CoreLocationAction, StateType == AppState 
         case let .toggleLocationServices(status): state.isLocationEnabled = status
         case let .toggleAuthorizationType(status): state.authorizationType = status ? .always : .whenInUse
         case let .toggleSLCMonitoring(status): state.isSLCEnabled = status
+        case let .toggleHeadingUpdates(status): state.isHeadingEnabled = status
         case let .lastKnownPosition(location):
             state.location = location
+            state.error = ""
+        case let .lastKnownHeading(heading):
+            state.heading = heading
             state.error = ""
         case let .triggerError(error):
             state.error = error.localizedDescription
@@ -223,8 +237,9 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
     
     private static func transform(_ viewAction: Content.ViewAction) -> AppAction? {
         switch viewAction {
-        case .toggleLocationMonitoring(let value): return .location(.toggleLocationServices(value))
-        case .toggleSLCMonitoring(let value): return .location(.toggleSLCMonitoring(value))
+        case let .toggleLocationMonitoring(value): return .location(.toggleLocationServices(value))
+        case let .toggleSLCMonitoring(value): return .location(.toggleSLCMonitoring(value))
+        case let .toggleHeadingServices(value): return .location(.toggleHeadingUpdates(value))
         case .getPositionButtonTapped: return .location(.requestPosition)
         }
     }
@@ -235,16 +250,13 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
             titleView: state.appTitle,
             sectionLocationMonitoringTitle: state.titleLocationServices,
             sectionSLCMonitoringTitle: state.titleSLCServices,
+            sectionHeadingUpdatesTitle: state.titleHeadingMonitoring,
             sectionRegionMonitoringTitle: state.titleRegionMonitoring,
             sectionBeaconRangingTitle: state.titleBeaconRanging,
             toggleLocationServices: Content.ContentItem(title: state.labelToggleLocationServices, value: state.isLocationEnabled),
             toggleSCLServices: Content.ContentItem(title: state.titleSLCServices, value: state.isSLCEnabled),
-            buttonLocationRequest: Content.ContentItem(title: state.labelGetLocation, value: "", action: .getPositionButtonTapped),
-            locationInformation: Content.ContentItem(
-                title: state.labelPosition,
-                value: "Lat : " + state.location.coordinate.latitude.description + " ; Lon : " + state.location.coordinate.longitude.description
-            ),
-            errorInformation: Content.ContentItem(title: state.labelErrorInformation, value: state.error)
+            toggleHeadingServices: Content.ContentItem(title: state.titleHeadingMonitoring, value: state.isHeadingEnabled),
+            buttonLocationRequest: Content.ContentItem(title: state.labelGetLocation, value: "", action: .getPositionButtonTapped)
         )
     }
 }
@@ -338,6 +350,29 @@ extension ObservableViewModel where ViewAction == SectionDeviceCapabilities.View
     }
 }
 
+extension ObservableViewModel where ViewAction == SectionInformation.ViewAction, ViewState == SectionInformation.ViewState {
+    static func informationSection<S: StoreType>(store: S) -> ObservableViewModel
+    where S.ActionType == AppAction, S.StateType == AppState {
+        return store
+            .projection(action: { _ in nil }, state: Self.transform)
+            .asObservableViewModel(initialState: .empty)
+    }
+        
+    private static func transform(from state: AppState) -> SectionInformation.ViewState {
+        
+        return SectionInformation.ViewState(
+            locationInformation: SectionInformation.ContentItem(
+                title: state.labelPosition,
+                value: "Lat : " + state.location.coordinate.latitude.description + " ; Lon : " + state.location.coordinate.longitude.description
+            ),
+            headingInformation: SectionInformation.ContentItem(
+                title: state.labelHeading,
+                value: state.heading?.description ?? ""
+            ),
+            errorInformation: SectionInformation.ContentItem(title: state.labelErrorInformation, value: state.error)
+        )
+    }
+}
 
 // MARK: - VIEW PRODUCERS
 extension ViewProducer where Context == Void, ProducedView == Content {
@@ -348,6 +383,7 @@ extension ViewProducer where Context == Void, ProducedView == Content {
                 viewModel: .content(store: store),
                 authzSectionProducer: .authzSection(store: store),
                 locationSectionProducer: .locationSection(store: store),
+                informationSectionProducer: .informationSection(store: store),
                 capabilitiesSectionProducer: .capabilitiesSection(store: store)
             )
         }
@@ -377,6 +413,15 @@ extension ViewProducer where Context == Void, ProducedView == SectionDeviceCapab
     where S.ActionType == AppAction, S.StateType == AppState {
         ViewProducer {
             SectionDeviceCapabilities(viewModel: .capabilitiesSection(store: store))
+        }
+    }
+}
+
+extension ViewProducer where Context == Void, ProducedView == SectionInformation {
+    static func informationSection<S: StoreType>(store: S) -> ViewProducer
+    where S.ActionType == AppAction, S.StateType == AppState {
+        ViewProducer {
+            SectionInformation(viewModel: .informationSection(store: store))
         }
     }
 }

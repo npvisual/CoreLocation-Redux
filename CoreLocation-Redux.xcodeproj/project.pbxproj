@@ -7,11 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8E00897B2523EAB5001555F8 /* CoreLocationMiddleware in Frameworks */ = {isa = PBXBuildFile; productRef = 8E00897A2523EAB5001555F8 /* CoreLocationMiddleware */; };
 		8E0EE722251BA02C00FE24AB /* AppLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0EE721251BA02C00FE24AB /* AppLifecycle.swift */; };
 		8E0EE723251BA02C00FE24AB /* AppLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0EE721251BA02C00FE24AB /* AppLifecycle.swift */; };
 		8E0EE729251BA12500FE24AB /* ActionPrism.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0EE728251BA12400FE24AB /* ActionPrism.swift */; };
 		8E0EE72A251BA12500FE24AB /* ActionPrism.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0EE728251BA12400FE24AB /* ActionPrism.swift */; };
-		8EC902602512CF5100106B71 /* CoreLocationMiddleware in Frameworks */ = {isa = PBXBuildFile; productRef = 8EC9025F2512CF5100106B71 /* CoreLocationMiddleware */; };
+		8E76E2C4252385E900229344 /* SectionLocationMonitoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E76E2C3252385E900229344 /* SectionLocationMonitoring.swift */; };
+		8E76E2C5252385E900229344 /* SectionLocationMonitoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E76E2C3252385E900229344 /* SectionLocationMonitoring.swift */; };
+		8E76E2CB252388A600229344 /* SectionDeviceCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E76E2CA252388A600229344 /* SectionDeviceCapabilities.swift */; };
+		8E76E2CC252388A600229344 /* SectionDeviceCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E76E2CA252388A600229344 /* SectionDeviceCapabilities.swift */; };
 		8ECC811E25101DD200CC8427 /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC811D25101DD200CC8427 /* Tests_iOS.swift */; };
 		8ECC812925101DD200CC8427 /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC812825101DD200CC8427 /* Tests_macOS.swift */; };
 		8ECC812B25101DD200CC8427 /* CoreLocation_ReduxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC810225101DD000CC8427 /* CoreLocation_ReduxApp.swift */; };
@@ -25,6 +29,10 @@
 		8ECC81492510294500CC8427 /* ReduxAppModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC81482510294500CC8427 /* ReduxAppModule.swift */; };
 		8ECC814A2510294500CC8427 /* ReduxAppModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC81482510294500CC8427 /* ReduxAppModule.swift */; };
 		8ECC814D25102A7600CC8427 /* LoggerMiddleware in Frameworks */ = {isa = PBXBuildFile; productRef = 8ECC814C25102A7600CC8427 /* LoggerMiddleware */; };
+		8EE00260251E8C26002C5F12 /* SectionAuthorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE0025F251E8C26002C5F12 /* SectionAuthorization.swift */; };
+		8EE00261251E8C26002C5F12 /* SectionAuthorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE0025F251E8C26002C5F12 /* SectionAuthorization.swift */; };
+		8EE3B75E252521AF0010F6B4 /* SectionInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE3B75D252521AF0010F6B4 /* SectionInformation.swift */; };
+		8EE3B75F252521AF0010F6B4 /* SectionInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EE3B75D252521AF0010F6B4 /* SectionInformation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +55,8 @@
 /* Begin PBXFileReference section */
 		8E0EE721251BA02C00FE24AB /* AppLifecycle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppLifecycle.swift; sourceTree = "<group>"; };
 		8E0EE728251BA12400FE24AB /* ActionPrism.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionPrism.swift; sourceTree = "<group>"; };
+		8E76E2C3252385E900229344 /* SectionLocationMonitoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionLocationMonitoring.swift; sourceTree = "<group>"; };
+		8E76E2CA252388A600229344 /* SectionDeviceCapabilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionDeviceCapabilities.swift; sourceTree = "<group>"; };
 		8ECC810225101DD000CC8427 /* CoreLocation_ReduxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreLocation_ReduxApp.swift; sourceTree = "<group>"; };
 		8ECC810325101DD000CC8427 /* Content.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Content.swift; sourceTree = "<group>"; };
 		8ECC810425101DD200CC8427 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -62,6 +72,8 @@
 		8ECC812825101DD200CC8427 /* Tests_macOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOS.swift; sourceTree = "<group>"; };
 		8ECC812A25101DD200CC8427 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8ECC81482510294500CC8427 /* ReduxAppModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReduxAppModule.swift; sourceTree = "<group>"; };
+		8EE0025F251E8C26002C5F12 /* SectionAuthorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionAuthorization.swift; sourceTree = "<group>"; };
+		8EE3B75D252521AF0010F6B4 /* SectionInformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionInformation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,7 +83,7 @@
 			files = (
 				8ECC814125101E5E00CC8427 /* CombineRex in Frameworks */,
 				8ECC814D25102A7600CC8427 /* LoggerMiddleware in Frameworks */,
-				8EC902602512CF5100106B71 /* CoreLocationMiddleware in Frameworks */,
+				8E00897B2523EAB5001555F8 /* CoreLocationMiddleware in Frameworks */,
 				8ECC814425101E8600CC8427 /* CombineRextensions in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -121,6 +133,10 @@
 				8ECC810325101DD000CC8427 /* Content.swift */,
 				8ECC81482510294500CC8427 /* ReduxAppModule.swift */,
 				8ECC810425101DD200CC8427 /* Assets.xcassets */,
+				8EE0025F251E8C26002C5F12 /* SectionAuthorization.swift */,
+				8E76E2C3252385E900229344 /* SectionLocationMonitoring.swift */,
+				8E76E2CA252388A600229344 /* SectionDeviceCapabilities.swift */,
+				8EE3B75D252521AF0010F6B4 /* SectionInformation.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -191,7 +207,7 @@
 				8ECC814025101E5E00CC8427 /* CombineRex */,
 				8ECC814325101E8600CC8427 /* CombineRextensions */,
 				8ECC814C25102A7600CC8427 /* LoggerMiddleware */,
-				8EC9025F2512CF5100106B71 /* CoreLocationMiddleware */,
+				8E00897A2523EAB5001555F8 /* CoreLocationMiddleware */,
 			);
 			productName = "CoreLocation-Redux (iOS)";
 			productReference = 8ECC810925101DD200CC8427 /* CoreLocation-Redux.app */;
@@ -288,7 +304,7 @@
 				8ECC813F25101E5E00CC8427 /* XCRemoteSwiftPackageReference "SwiftRex" */,
 				8ECC814225101E8600CC8427 /* XCRemoteSwiftPackageReference "CombineRextensions" */,
 				8ECC814B25102A7600CC8427 /* XCRemoteSwiftPackageReference "LoggerMiddleware" */,
-				8EC9025E2512CF5100106B71 /* XCRemoteSwiftPackageReference "CoreLocationMiddleware" */,
+				8E0089792523EAB5001555F8 /* XCRemoteSwiftPackageReference "CoreLocationMiddleware" */,
 			);
 			productRefGroup = 8ECC810A25101DD200CC8427 /* Products */;
 			projectDirPath = "";
@@ -341,10 +357,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				8ECC812D25101DD200CC8427 /* Content.swift in Sources */,
+				8E76E2CB252388A600229344 /* SectionDeviceCapabilities.swift in Sources */,
 				8E0EE729251BA12500FE24AB /* ActionPrism.swift in Sources */,
 				8ECC812B25101DD200CC8427 /* CoreLocation_ReduxApp.swift in Sources */,
+				8E76E2C4252385E900229344 /* SectionLocationMonitoring.swift in Sources */,
 				8E0EE722251BA02C00FE24AB /* AppLifecycle.swift in Sources */,
 				8ECC81492510294500CC8427 /* ReduxAppModule.swift in Sources */,
+				8EE3B75E252521AF0010F6B4 /* SectionInformation.swift in Sources */,
+				8EE00260251E8C26002C5F12 /* SectionAuthorization.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -353,10 +373,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				8ECC812E25101DD200CC8427 /* Content.swift in Sources */,
+				8E76E2CC252388A600229344 /* SectionDeviceCapabilities.swift in Sources */,
 				8E0EE72A251BA12500FE24AB /* ActionPrism.swift in Sources */,
 				8ECC812C25101DD200CC8427 /* CoreLocation_ReduxApp.swift in Sources */,
+				8E76E2C5252385E900229344 /* SectionLocationMonitoring.swift in Sources */,
 				8E0EE723251BA02C00FE24AB /* AppLifecycle.swift in Sources */,
 				8ECC814A2510294500CC8427 /* ReduxAppModule.swift in Sources */,
+				8EE3B75F252521AF0010F6B4 /* SectionInformation.swift in Sources */,
+				8EE00261251E8C26002C5F12 /* SectionAuthorization.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -738,7 +762,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		8EC9025E2512CF5100106B71 /* XCRemoteSwiftPackageReference "CoreLocationMiddleware" */ = {
+		8E0089792523EAB5001555F8 /* XCRemoteSwiftPackageReference "CoreLocationMiddleware" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SwiftRex/CoreLocationMiddleware";
 			requirement = {
@@ -773,9 +797,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		8EC9025F2512CF5100106B71 /* CoreLocationMiddleware */ = {
+		8E00897A2523EAB5001555F8 /* CoreLocationMiddleware */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 8EC9025E2512CF5100106B71 /* XCRemoteSwiftPackageReference "CoreLocationMiddleware" */;
+			package = 8E0089792523EAB5001555F8 /* XCRemoteSwiftPackageReference "CoreLocationMiddleware" */;
 			productName = CoreLocationMiddleware;
 		};
 		8ECC814025101E5E00CC8427 /* CombineRex */ = {

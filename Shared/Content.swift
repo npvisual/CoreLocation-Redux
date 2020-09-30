@@ -15,6 +15,7 @@ struct Content: View {
     @ObservedObject var viewModel: ObservableViewModel<ViewAction, ViewState>
     let authzSectionProducer: ViewProducer<Void, SectionAuthorization>
     let locationSectionProducer: ViewProducer<Void, SectionLocationMonitoring>
+    let informationSectionProducer: ViewProducer<Void, SectionInformation>
     let capabilitiesSectionProducer: ViewProducer<Void, SectionDeviceCapabilities>
     
     var body: some View {
@@ -24,19 +25,22 @@ struct Content: View {
                 .padding()
             Form {
                 authzSectionProducer.view()
-                Section {
-                    Text(viewModel.state.locationInformation.title + viewModel.state.locationInformation.value)
-                    Text(viewModel.state.errorInformation.title + viewModel.state.errorInformation.value)
-                        .truncationMode(.tail)
-                        .allowsTightening(true)
-                }
                 locationSectionProducer.view()
+                informationSectionProducer.view()
                 Section(header: Text(viewModel.state.sectionSLCMonitoringTitle)) {
                     Toggle(
                         viewModel: viewModel,
                         state: \.toggleSCLServices.value,
                         onToggle: { ViewAction.toggleSLCMonitoring($0) }) {
                         Text(viewModel.state.toggleSCLServices.title)
+                    }
+                }
+                Section(header: Text(viewModel.state.sectionHeadingUpdatesTitle)) {
+                    Toggle(
+                        viewModel: viewModel,
+                        state: \.toggleHeadingServices.value,
+                        onToggle: { ViewAction.toggleHeadingServices($0) }) {
+                        Text(viewModel.state.toggleHeadingServices.title)
                     }
                 }
                 Section(header: Text(viewModel.state.sectionRegionMonitoringTitle)) {
@@ -67,6 +71,7 @@ struct Content_Previews: PreviewProvider {
     static let mockViewModel = ObservableViewModel.content(store: mockStore)
     static let mockAuthzSectionProducer = ViewProducer.authzSection(store: mockStore)
     static let mockLocationSectionProducer = ViewProducer.locationSection(store: mockStore)
+    static let mockInformationSectionProducer = ViewProducer.informationSection(store: mockStore)
     static let mockCapabilitiesSectionProducer = ViewProducer.capabilitiesSection(store: mockStore)
     
     static var previews: some View {
@@ -74,6 +79,7 @@ struct Content_Previews: PreviewProvider {
             viewModel: mockViewModel,
             authzSectionProducer: mockAuthzSectionProducer,
             locationSectionProducer: mockLocationSectionProducer,
+            informationSectionProducer: mockInformationSectionProducer,
             capabilitiesSectionProducer: mockCapabilitiesSectionProducer
         )
     }
@@ -83,6 +89,7 @@ extension Content {
     enum ViewAction: Equatable {
         case toggleLocationMonitoring(Bool)
         case toggleSLCMonitoring(Bool)
+        case toggleHeadingServices(Bool)
         case getPositionButtonTapped
     }
     
@@ -90,26 +97,26 @@ extension Content {
         let titleView: String
         let sectionLocationMonitoringTitle: String
         let sectionSLCMonitoringTitle: String
+        let sectionHeadingUpdatesTitle: String
         let sectionRegionMonitoringTitle: String
         let sectionBeaconRangingTitle: String
         let toggleLocationServices: ContentItem<Bool>
         let toggleSCLServices: ContentItem<Bool>
+        let toggleHeadingServices: ContentItem<Bool>
         let buttonLocationRequest: ContentItem<String>
-        let locationInformation: ContentItem<String>
-        let errorInformation: ContentItem<String>
         
         static var empty: ViewState {
             .init(
                 titleView: "",
                 sectionLocationMonitoringTitle: "",
                 sectionSLCMonitoringTitle: "",
+                sectionHeadingUpdatesTitle: "",
                 sectionRegionMonitoringTitle: "",
                 sectionBeaconRangingTitle: "",
                 toggleLocationServices: ContentItem(title: "", value: false),
                 toggleSCLServices: ContentItem(title: "", value: false),
-                buttonLocationRequest: ContentItem(title: "", value: ""),
-                locationInformation: ContentItem(title: "", value: ""),
-                errorInformation: ContentItem(title: "", value: "")
+                toggleHeadingServices: ContentItem(title: "", value: false),
+                buttonLocationRequest: ContentItem(title: "", value: "")
             )
         }
     }
