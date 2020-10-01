@@ -16,8 +16,6 @@ struct SectionInformation: View {
     var body: some View {
         Section {
             Text(viewModel.state.locationInformation.title + viewModel.state.locationInformation.value)
-            Text(viewModel.state.headingInformation.title +
-                    viewModel.state.headingInformation.value)
             Text(viewModel.state.errorInformation.title + viewModel.state.errorInformation.value)
                 .truncationMode(.tail)
                 .allowsTightening(true)
@@ -46,13 +44,11 @@ extension SectionInformation {
     
     struct ViewState: Equatable {
         let locationInformation: ContentItem<String>
-        let headingInformation: ContentItem<String>
         let errorInformation: ContentItem<String>
         
         static var empty: ViewState {
             .init(
                 locationInformation: ContentItem(title: "", value: ""),
-                headingInformation: ContentItem(title: "", value: ""),
                 errorInformation: ContentItem(title: "", value: "")
             )
         }

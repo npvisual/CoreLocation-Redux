@@ -18,6 +18,7 @@ struct Content: View {
     let informationSectionProducer: ViewProducer<Void, SectionInformation>
     let slcSectionProducer: ViewProducer<Void, SectionSLCMonitoring>
     let headingSectionProducer: ViewProducer<Void, SectionHeadingUpdates>
+    let regionSectionProducer: ViewProducer<Void, SectionRegionMonitoring>
     let capabilitiesSectionProducer: ViewProducer<Void, SectionDeviceCapabilities>
     
     var body: some View {
@@ -31,11 +32,7 @@ struct Content: View {
                 informationSectionProducer.view()
                 slcSectionProducer.view()
                 headingSectionProducer.view()
-                Section(header: Text(viewModel.state.sectionRegionMonitoringTitle)) {
-                    Toggle(isOn: .constant(false)) {
-                        Text("Region Monitoring")
-                    }
-                }
+                regionSectionProducer.view()
                 Section(header: Text(viewModel.state.sectionBeaconRangingTitle)) {
                     Toggle(isOn: .constant(false)) {
                         Text("Beacon Ranging")
@@ -62,6 +59,7 @@ struct Content_Previews: PreviewProvider {
     static let mockInformationSectionProducer = ViewProducer.informationSection(store: mockStore)
     static let mockSLCSectionProducer = ViewProducer.slcSection(store: mockStore)
     static let mockHeadingSectionProducer = ViewProducer.headingSection(store: mockStore)
+    static let mockRegionSectionProducer = ViewProducer.regionSection(store: mockStore)
     static let mockCapabilitiesSectionProducer = ViewProducer.capabilitiesSection(store: mockStore)
     
     static var previews: some View {
@@ -72,6 +70,7 @@ struct Content_Previews: PreviewProvider {
             informationSectionProducer: mockInformationSectionProducer,
             slcSectionProducer: mockSLCSectionProducer,
             headingSectionProducer: mockHeadingSectionProducer,
+            regionSectionProducer: mockRegionSectionProducer,
             capabilitiesSectionProducer: mockCapabilitiesSectionProducer
         )
     }
@@ -84,14 +83,12 @@ extension Content {
     
     struct ViewState: Equatable {
         let titleView: String
-        let sectionRegionMonitoringTitle: String
         let sectionBeaconRangingTitle: String
         let buttonLocationRequest: ContentItem<String>
         
         static var empty: ViewState {
             .init(
                 titleView: "",
-                sectionRegionMonitoringTitle: "",
                 sectionBeaconRangingTitle: "",
                 buttonLocationRequest: ContentItem(title: "", value: "")
             )

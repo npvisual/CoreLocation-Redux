@@ -23,18 +23,28 @@ enum CoreLocationAction {
     case toggleAuthorizationType(Bool)
     case toggleSLCMonitoring(Bool)
     case toggleHeadingUpdates(Bool)
+    case toggleRegionMonitoring(Bool, CLRegion?)
     case gotAuthorizationStatus(AuthzStatus)
     case lastKnownPosition(CLLocation)
     case lastKnownHeading(CLHeading)
+    case lastKnownRegionEvent(CLRegion, CLRegionState)
     case gotDeviceCapabilities(DeviceCapabilities)
     case requestAuthorizationType
     case requestPosition
     case requestDeviceCapabilities
+    case requestRegionState(CLRegion)
     case triggerError(Error)
 }
 
 struct AppState: Equatable {
     
+    // TODO : replace with a configurable region
+    static let regionToMonitor: CLCircularRegion = CLCircularRegion(
+        center: CLLocationCoordinate2D(latitude: 51.50998, longitude: -0.1337),
+        radius: CLLocationDistance(500),
+        identifier: "London, England"
+    )
+
     // MARK: - App lifecycle
     var appLifecycle: AppLifecycle = .backgroundInactive
     
@@ -58,12 +68,14 @@ struct AppState: Equatable {
     let labelAuthorizationStatus = "Authorization Status : "
     let labelGetAuthorization = "Request Authorization !"
     let labelPosition = "Position : "
-    let labelHeading = "Heading : "
+    let labelInfo = "Info : "
     let labelAccuracy = "Authorization accuracy : "
     let labelGetLocation = "Request Position !"
+    let labelGetRegionState = "Request Region State !"
     let labelToggleLocationServices = "Monitor Location"
     let labelToggleSCLMonitoring = "Significant Location"
     let labelToggleHeadingMonitoring = "Update Heading"
+    let labelToggleRegionMonitoring = "Region Monitoring"
     let labelToggleVisitsMonitoring = "Receive Visit-related Events"
     let labelToggleAuthType = "Request Always On (no impact on status) ?"
     let labelIsAvailableSLC = "SLC service : "
@@ -79,6 +91,7 @@ struct AppState: Equatable {
     var isLocationEnabled: Bool
     var isSLCEnabled: Bool = false
     var isHeadingEnabled: Bool = false
+    var isRegionEnabled: Bool = false
     // Device Capabilities
     var isSignificantLocationChangeCapable: Bool = false
     var isRegionMonitoringCapable: Bool = false
@@ -92,6 +105,9 @@ struct AppState: Equatable {
     // Location data
     var location: CLLocation = CLLocation()
     var heading: CLHeading? = nil
+    var region: CLRegion? = nil
+    var regionStatus: CLRegionState? = nil
+    // Configuration data
     
     var error: String = ""
     
@@ -153,7 +169,18 @@ let appMiddleware = LoggerMiddleware<IdentityMiddleware<AppAction, AppAction, Ap
                 } else {
                     return .request(.stop(.headingUpdates))
                 }
+            case let .location(.toggleRegionMonitoring(status, region)):
+                if let region = region {
+                    if status {
+                        return .request(.start(.regionMonitoring(region)))
+                    } else {
+                        return .request(.stop(.regionMonitoring(region)))
+                    }
+                } else {
+                    return nil
+                }
             case .location(.requestPosition): return .request(.requestPosition)
+            case let .location(.requestRegionState(region)): return .request(.requestState(region))
             case .location(.requestAuthorizationType): return .request(.requestAuthorizationType)
             case .location(.requestDeviceCapabilities): return .request(.requestDeviceCapabilities)
             default: return nil
@@ -164,6 +191,8 @@ let appMiddleware = LoggerMiddleware<IdentityMiddleware<AppAction, AppAction, Ap
             case let .status(.gotAuthzStatus(status)): return .location(.gotAuthorizationStatus(status))
             case let .status(.gotPosition(location)): return .location(.lastKnownPosition(location))
             case let .status(.gotHeading(heading)): return .location(.lastKnownHeading(heading))
+            case let .status(.gotRegion(region, state)): return
+                .location(.lastKnownRegionEvent(region, state))
             case let .status(.gotDeviceCapabilities(capabilities)): return .location(.gotDeviceCapabilities(capabilities))
             case let .status(.receiveError(error)): return .location(.triggerError(error))
             default: return .location(.toggleLocationServices(false))
@@ -199,12 +228,17 @@ extension Reducer where ActionType == CoreLocationAction, StateType == AppState 
         case let .toggleAuthorizationType(status): state.authorizationType = status ? .always : .whenInUse
         case let .toggleSLCMonitoring(status): state.isSLCEnabled = status
         case let .toggleHeadingUpdates(status): state.isHeadingEnabled = status
+        case let .toggleRegionMonitoring(status, _):
+            state.isRegionEnabled = status
         case let .lastKnownPosition(location):
             state.location = location
             state.error = ""
         case let .lastKnownHeading(heading):
             state.heading = heading
             state.error = ""
+        case let .lastKnownRegionEvent(region, status):
+            state.region = region
+            state.regionStatus = status
         case let .triggerError(error):
             state.error = error.localizedDescription
             state.location = CLLocation()
@@ -220,6 +254,7 @@ extension Reducer where ActionType == CoreLocationAction, StateType == AppState 
             state.isLocationServiceCapable = capabilities.isLocationServiceAvailable
         case .requestAuthorizationType,
              .requestPosition,
+             .requestRegionState,
              .requestDeviceCapabilities: break
         }
         return state
@@ -245,7 +280,6 @@ extension ObservableViewModel where ViewAction == Content.ViewAction, ViewState 
         
         return Content.ViewState(
             titleView: state.appTitle,
-            sectionRegionMonitoringTitle: state.titleRegionMonitoring,
             sectionBeaconRangingTitle: state.titleBeaconRanging,
             buttonLocationRequest: Content.ContentItem(title: state.labelGetLocation, value: "", action: .getPositionButtonTapped)
         )
@@ -356,10 +390,6 @@ extension ObservableViewModel where ViewAction == SectionInformation.ViewAction,
                 title: state.labelPosition,
                 value: "Lat : " + state.location.coordinate.latitude.description + " ; Lon : " + state.location.coordinate.longitude.description
             ),
-            headingInformation: SectionInformation.ContentItem(
-                title: state.labelHeading,
-                value: state.heading?.description ?? ""
-            ),
             errorInformation: SectionInformation.ContentItem(title: state.labelErrorInformation, value: state.error)
         )
     }
@@ -407,9 +437,62 @@ extension ObservableViewModel where ViewAction == SectionHeadingUpdates.ViewActi
         return SectionHeadingUpdates.ViewState(
             sectionHeadingUpdatesTitle: state.titleHeadingMonitoring,
             toggleHeadingServices: SectionHeadingUpdates.ContentItem(
-                title: state.labelHeading,
+                title: state.labelToggleHeadingMonitoring,
                 value: state.isHeadingEnabled
+            ),
+            headingInformation: SectionHeadingUpdates.ContentItem(
+                title: state.labelInfo,
+                value: state.heading?.description ?? ""
             )
+        )
+    }
+}
+
+extension ObservableViewModel where ViewAction == SectionRegionMonitoring.ViewAction, ViewState == SectionRegionMonitoring.ViewState {
+    static func regionSection<S: StoreType>(store: S) -> ObservableViewModel
+    where S.ActionType == AppAction, S.StateType == AppState {
+        return store
+            .projection(action: Self.transform, state: Self.transform)
+            .asObservableViewModel(initialState: .empty)
+    }
+    
+    private static func transform(_ viewAction: SectionRegionMonitoring.ViewAction) -> AppAction? {
+        switch viewAction {
+        case let .toggleRegionMonitoring(status): return .location(.toggleRegionMonitoring(status, AppState.regionToMonitor))
+        case .getRegionStateButtonTapped: return .location(.requestRegionState(AppState.regionToMonitor))
+        }
+    }
+    
+    private static func transform(from state: AppState) -> SectionRegionMonitoring.ViewState {
+        
+        var status: String = "N/A"
+        var region: String = state.region?.identifier ?? ""
+        switch state.regionStatus {
+        case .inside:
+            status = "Inside "
+        case .outside:
+            status = "Outside "
+        default:
+            region = ""
+        }
+        
+        return SectionRegionMonitoring.ViewState(
+            sectionRegionMonitoringTitle: state.titleRegionMonitoring,
+            toggleRegionMonitoringServices:
+                SectionRegionMonitoring.ContentItem(
+                    title: state.labelToggleRegionMonitoring,
+                    value: state.isRegionEnabled
+                ),
+            regionInformation:
+                SectionRegionMonitoring.ContentItem(
+                    title: state.labelInfo,
+                    value: status + region
+                ),
+            buttonRegionStateRequest:
+                SectionRegionMonitoring.ContentItem(
+                    title: state.labelGetRegionState,
+                    value: "",
+                    action: .getRegionStateButtonTapped)
         )
     }
 }
@@ -426,6 +509,7 @@ extension ViewProducer where Context == Void, ProducedView == Content {
                 informationSectionProducer: .informationSection(store: store),
                 slcSectionProducer: .slcSection(store: store),
                 headingSectionProducer: .headingSection(store: store),
+                regionSectionProducer: .regionSection(store: store),
                 capabilitiesSectionProducer: .capabilitiesSection(store: store)
             )
         }
@@ -482,6 +566,15 @@ extension ViewProducer where Context == Void, ProducedView == SectionHeadingUpda
     where S.ActionType == AppAction, S.StateType == AppState {
         ViewProducer {
             SectionHeadingUpdates(viewModel: .headingSection(store: store))
+        }
+    }
+}
+
+extension ViewProducer where Context == Void, ProducedView == SectionRegionMonitoring {
+    static func regionSection<S: StoreType>(store: S) -> ViewProducer
+    where S.ActionType == AppAction, S.StateType == AppState {
+        ViewProducer {
+            SectionRegionMonitoring(viewModel: .regionSection(store: store))
         }
     }
 }

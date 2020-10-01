@@ -21,6 +21,10 @@ struct SectionHeadingUpdates: View {
                 onToggle: { ViewAction.toggleHeadingServices($0) }) {
                 Text(viewModel.state.toggleHeadingServices.title)
             }
+            Text(viewModel.state.headingInformation.title +
+                    viewModel.state.headingInformation.value)
+                .truncationMode(.tail)
+                .allowsTightening(true)
         }
     }
 }
@@ -49,11 +53,13 @@ extension SectionHeadingUpdates {
     struct ViewState: Equatable {
         let sectionHeadingUpdatesTitle: String
         let toggleHeadingServices: ContentItem<Bool>
+        let headingInformation: ContentItem<String>
         
         static var empty: ViewState {
             .init(
                 sectionHeadingUpdatesTitle: "",
-                toggleHeadingServices: ContentItem(title: "", value: false)
+                toggleHeadingServices: ContentItem(title: "", value: false),
+                headingInformation: ContentItem(title: "", value: "")
             )
         }
     }
