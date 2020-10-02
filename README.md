@@ -1,5 +1,5 @@
 # CoreLocation-Redux
-A sample Redux app to test the CoreLocationMiddleware
+A sample Redux app to test the [CoreLocationMiddleware](https://github.com/SwiftRex/CoreLocationMiddleware)
 
 This version contains : 
 
