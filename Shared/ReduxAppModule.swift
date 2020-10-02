@@ -25,12 +25,14 @@ enum CoreLocationAction {
     case toggleHeadingUpdates(Bool)
     case toggleRegionMonitoring(Bool, CLRegion)
     case toggleBeaconRanging(Bool, CLBeaconIdentityConstraint)
+    case toggleVisitEventUpdates(Bool)
     case pickRegionType(Int)
     case gotAuthorizationStatus(AuthzStatus)
     case lastKnownPosition(CLLocation)
     case lastKnownHeading(CLHeading)
     case lastKnownRegionEvent(CLRegion, CLRegionState)
     case lastKnownBeaconRanging([CLBeacon], CLBeaconIdentityConstraint)
+    case lastKnownVisitEvent(CLVisit)
     case gotDeviceCapabilities(DeviceCapabilities)
     case requestAuthorizationType
     case requestPosition
@@ -49,12 +51,13 @@ struct AppState: Equatable {
     )
     // TODO: replace with a configurable beacon
     // Note that the forced unwrapped is necessary here and will always be valid.
+    // The UUID is taken from the Apple project in the Core Location documentation.
+    static let beaconUUID = UUID.init(uuidString: "E2C56DB5-DFFB-48D2-B060-D0F5A71096E0")!
     static let beaconIdentityConstraint: CLBeaconIdentityConstraint = CLBeaconIdentityConstraint(
-        uuid: UUID.init(uuidString: "212D2900-B802-40B2-B0A3-8BDF3CBAF105")!,
-        major: CLBeaconMajorValue()
+        uuid: beaconUUID
     )
     static let beaconRegion: CLBeaconRegion =  CLBeaconRegion(
-        beaconIdentityConstraint: AppState.beaconIdentityConstraint,
+        beaconIdentityConstraint: beaconIdentityConstraint,
         identifier: "CoreLocation-Redux"
     )
 
@@ -99,7 +102,7 @@ struct AppState: Equatable {
     let labelIsAvailableMonitoring = "Region Monitoring for CLCircularRegion : "
     let labelIsAvailableRanging = "Ranging for iBeacon : "
     let labelRegionMonitoringFootNote = "Region with latitude: 51.50998, longitude: -0.1337"
-    let labelBeaconRangingFootNote = "Ranging beacon with identifier : 212D2900-...-8BDF3CBAF105"
+    let labelBeaconRangingFootNote = "Ranging beacon with identifier : " + beaconUUID.description
     let labelErrorInformation = "Error : "
     
     // MARK: - Application logic
@@ -111,6 +114,7 @@ struct AppState: Equatable {
     var isHeadingEnabled: Bool = false
     var isRegionMonitoringEnabled: Bool = false
     var isBeaconRangingEnabled: Bool = false
+    var isVisitEventUpdatesEnabled: Bool = false
     // Device Capabilities
     var isSignificantLocationChangeCapable: Bool = false
     var isRegionMonitoringCapable: Bool = false
@@ -128,6 +132,7 @@ struct AppState: Equatable {
     var regionStatus: CLRegionState? = nil
     var beacons: [CLBeacon]? = nil
     var beaconConstraint: CLBeaconIdentityConstraint? = nil
+    var visit: CLVisit? = nil
     // Configuration data
     var regionChoice: CLRegion = AppState.regionToMonitor
     var regionType: Int = 0
@@ -205,6 +210,12 @@ let appMiddleware = LoggerMiddleware<IdentityMiddleware<AppAction, AppAction, Ap
                 } else {
                     return .request(.stop(.beaconRanging(constraint)))
                 }
+            case let .location(.toggleVisitEventUpdates(status)):
+                if status {
+                    return .request(.start(.visitMonitoring))
+                } else {
+                    return .request(.stop(.visitMonitoring))
+                }
             case .location(.requestPosition): return .request(.requestPosition)
             case let .location(.requestRegionState(region)): return .request(.requestState(region))
             case .location(.requestAuthorizationType): return .request(.requestAuthorizationType)
@@ -219,6 +230,7 @@ let appMiddleware = LoggerMiddleware<IdentityMiddleware<AppAction, AppAction, Ap
             case let .status(.gotHeading(heading)): return .location(.lastKnownHeading(heading))
             case let .status(.gotRegion(region, state)): return .location(.lastKnownRegionEvent(region, state))
             case let .status(.gotBeacon(beacons, constraint)): return .location(.lastKnownBeaconRanging(beacons, constraint))
+            case let .status(.gotVisit(visit)): return .location(.lastKnownVisitEvent(visit))
             case let .status(.gotDeviceCapabilities(capabilities)): return .location(.gotDeviceCapabilities(capabilities))
             case let .status(.receiveError(error)): return .location(.triggerError(error))
             default: return .location(.toggleLocationServices(false))
@@ -260,6 +272,7 @@ extension Reducer where ActionType == CoreLocationAction, StateType == AppState 
         case let .toggleBeaconRanging(status, constraint):
             state.isBeaconRangingEnabled = status
             state.beaconConstraint = constraint
+        case let .toggleVisitEventUpdates(status): state.isVisitEventUpdatesEnabled = status
         case let .pickRegionType(type):
             state.regionType = type
         case let .lastKnownPosition(location):
@@ -271,9 +284,14 @@ extension Reducer where ActionType == CoreLocationAction, StateType == AppState 
         case let .lastKnownRegionEvent(region, status):
             state.region = region
             state.regionStatus = status
+            state.error = ""
         case let .lastKnownBeaconRanging(beacons, constraint):
             state.beacons = beacons
             state.beaconConstraint = constraint
+            state.error = ""
+        case let .lastKnownVisitEvent(visit):
+            state.visit = visit
+            state.error = ""
         case let .triggerError(error):
             state.error = error.localizedDescription
             state.location = CLLocation()
@@ -602,6 +620,36 @@ extension ObservableViewModel where ViewAction == SectionBeaconRanging.ViewActio
     }
 }
 
+extension ObservableViewModel where ViewAction == SectionVisitMonitoring.ViewAction, ViewState == SectionVisitMonitoring.ViewState {
+    static func visitEventsSection<S: StoreType>(store: S) -> ObservableViewModel
+    where S.ActionType == AppAction, S.StateType == AppState {
+        return store
+            .projection(action: Self.transform, state: Self.transform)
+            .asObservableViewModel(initialState: .empty)
+    }
+    
+    private static func transform(_ viewAction: SectionVisitMonitoring.ViewAction) -> AppAction? {
+        switch viewAction {
+        case let .toggleVisitEventsService(value): return .location(.toggleVisitEventUpdates(value))
+        }
+    }
+    
+    private static func transform(from state: AppState) -> SectionVisitMonitoring.ViewState {
+        
+        return SectionVisitMonitoring.ViewState(
+            sectionVisitEventUpdatesTitle: state.titleVisitMonitoring,
+            toggleVisitEventsService: SectionVisitMonitoring.ContentItem(
+                title: state.labelToggleVisitsMonitoring,
+                value: state.isVisitEventUpdatesEnabled
+            ),
+            visitEventsInformation: SectionVisitMonitoring.ContentItem(
+                title: state.labelInfo,
+                value: state.visit?.description ?? ""
+            )
+        )
+    }
+}
+
 // MARK: - VIEW PRODUCERS
 extension ViewProducer where Context == Void, ProducedView == Content {
     static func content<S: StoreType>(store: S) -> ViewProducer
@@ -616,6 +664,7 @@ extension ViewProducer where Context == Void, ProducedView == Content {
                 headingSectionProducer: .headingSection(store: store),
                 regionSectionProducer: .regionSection(store: store),
                 beaconSectionProducer: .beaconSection(store: store),
+                visitEventsSectionProducer: .visitEventsSection(store: store),
                 capabilitiesSectionProducer: .capabilitiesSection(store: store)
             )
         }
@@ -690,6 +739,15 @@ extension ViewProducer where Context == Void, ProducedView == SectionBeaconRangi
     where S.ActionType == AppAction, S.StateType == AppState {
         ViewProducer {
             SectionBeaconRanging(viewModel: .beaconSection(store: store))
+        }
+    }
+}
+
+extension ViewProducer where Context == Void, ProducedView == SectionVisitMonitoring {
+    static func visitEventsSection<S: StoreType>(store: S) -> ViewProducer
+    where S.ActionType == AppAction, S.StateType == AppState {
+        ViewProducer {
+            SectionVisitMonitoring(viewModel: .visitEventsSection(store: store))
         }
     }
 }

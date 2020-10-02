@@ -20,6 +20,7 @@ struct Content: View {
     let headingSectionProducer: ViewProducer<Void, SectionHeadingUpdates>
     let regionSectionProducer: ViewProducer<Void, SectionRegionMonitoring>
     let beaconSectionProducer: ViewProducer<Void, SectionBeaconRanging>
+    let visitEventsSectionProducer: ViewProducer<Void, SectionVisitMonitoring>
     let capabilitiesSectionProducer: ViewProducer<Void, SectionDeviceCapabilities>
     
     var body: some View {
@@ -35,6 +36,7 @@ struct Content: View {
                 headingSectionProducer.view()
                 regionSectionProducer.view()
                 beaconSectionProducer.view()
+                visitEventsSectionProducer.view()
                 capabilitiesSectionProducer.view()
             }
         }
@@ -58,6 +60,7 @@ struct Content_Previews: PreviewProvider {
     static let mockHeadingSectionProducer = ViewProducer.headingSection(store: mockStore)
     static let mockRegionSectionProducer = ViewProducer.regionSection(store: mockStore)
     static let mockBeaconSectionProducer = ViewProducer.beaconSection(store: mockStore)
+    static let mockVisitEventsSectionProducer = ViewProducer.visitEventsSection(store: mockStore)
     static let mockCapabilitiesSectionProducer = ViewProducer.capabilitiesSection(store: mockStore)
     
     static var previews: some View {
@@ -70,6 +73,7 @@ struct Content_Previews: PreviewProvider {
             headingSectionProducer: mockHeadingSectionProducer,
             regionSectionProducer: mockRegionSectionProducer,
             beaconSectionProducer: mockBeaconSectionProducer,
+            visitEventsSectionProducer: mockVisitEventsSectionProducer,
             capabilitiesSectionProducer: mockCapabilitiesSectionProducer
         )
     }

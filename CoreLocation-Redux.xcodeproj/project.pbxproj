@@ -12,6 +12,8 @@
 		8E0EE723251BA02C00FE24AB /* AppLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0EE721251BA02C00FE24AB /* AppLifecycle.swift */; };
 		8E0EE729251BA12500FE24AB /* ActionPrism.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0EE728251BA12400FE24AB /* ActionPrism.swift */; };
 		8E0EE72A251BA12500FE24AB /* ActionPrism.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0EE728251BA12400FE24AB /* ActionPrism.swift */; };
+		8E3B9298252777D500EBCD0E /* SectionVisitMonitoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E3B9297252777D500EBCD0E /* SectionVisitMonitoring.swift */; };
+		8E3B9299252777D500EBCD0E /* SectionVisitMonitoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E3B9297252777D500EBCD0E /* SectionVisitMonitoring.swift */; };
 		8E6A08D82525350F00796888 /* SectionHeadingUpdates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E6A08D72525350F00796888 /* SectionHeadingUpdates.swift */; };
 		8E6A08D92525350F00796888 /* SectionHeadingUpdates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E6A08D72525350F00796888 /* SectionHeadingUpdates.swift */; };
 		8E6A08DF252540C500796888 /* SectionRegionMonitoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E6A08DE252540C500796888 /* SectionRegionMonitoring.swift */; };
@@ -63,6 +65,7 @@
 /* Begin PBXFileReference section */
 		8E0EE721251BA02C00FE24AB /* AppLifecycle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppLifecycle.swift; sourceTree = "<group>"; };
 		8E0EE728251BA12400FE24AB /* ActionPrism.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionPrism.swift; sourceTree = "<group>"; };
+		8E3B9297252777D500EBCD0E /* SectionVisitMonitoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionVisitMonitoring.swift; sourceTree = "<group>"; };
 		8E6A08D72525350F00796888 /* SectionHeadingUpdates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeadingUpdates.swift; sourceTree = "<group>"; };
 		8E6A08DE252540C500796888 /* SectionRegionMonitoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionRegionMonitoring.swift; sourceTree = "<group>"; };
 		8E76E2C3252385E900229344 /* SectionLocationMonitoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionLocationMonitoring.swift; sourceTree = "<group>"; };
@@ -153,6 +156,7 @@
 				8E6A08D72525350F00796888 /* SectionHeadingUpdates.swift */,
 				8E6A08DE252540C500796888 /* SectionRegionMonitoring.swift */,
 				8EC1B1C52525F2D800AE54E8 /* SectionBeaconRanging.swift */,
+				8E3B9297252777D500EBCD0E /* SectionVisitMonitoring.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -385,6 +389,7 @@
 				8EE3B75E252521AF0010F6B4 /* SectionInformation.swift in Sources */,
 				8EE00260251E8C26002C5F12 /* SectionAuthorization.swift in Sources */,
 				8E6A08DF252540C500796888 /* SectionRegionMonitoring.swift in Sources */,
+				8E3B9298252777D500EBCD0E /* SectionVisitMonitoring.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -405,6 +410,7 @@
 				8EE3B75F252521AF0010F6B4 /* SectionInformation.swift in Sources */,
 				8EE00261251E8C26002C5F12 /* SectionAuthorization.swift in Sources */,
 				8E6A08E0252540C500796888 /* SectionRegionMonitoring.swift in Sources */,
+				8E3B9299252777D500EBCD0E /* SectionVisitMonitoring.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
