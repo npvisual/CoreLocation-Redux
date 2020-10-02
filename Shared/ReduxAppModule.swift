@@ -23,11 +23,14 @@ enum CoreLocationAction {
     case toggleAuthorizationType(Bool)
     case toggleSLCMonitoring(Bool)
     case toggleHeadingUpdates(Bool)
-    case toggleRegionMonitoring(Bool, CLRegion?)
+    case toggleRegionMonitoring(Bool, CLRegion)
+    case toggleBeaconRanging(Bool, CLBeaconIdentityConstraint)
+    case pickRegionType(Int)
     case gotAuthorizationStatus(AuthzStatus)
     case lastKnownPosition(CLLocation)
     case lastKnownHeading(CLHeading)
     case lastKnownRegionEvent(CLRegion, CLRegionState)
+    case lastKnownBeaconRanging([CLBeacon], CLBeaconIdentityConstraint)
     case gotDeviceCapabilities(DeviceCapabilities)
     case requestAuthorizationType
     case requestPosition
@@ -38,11 +41,21 @@ enum CoreLocationAction {
 
 struct AppState: Equatable {
     
-    // TODO : replace with a configurable region
+    // TODO: replace with a configurable region
     static let regionToMonitor: CLCircularRegion = CLCircularRegion(
         center: CLLocationCoordinate2D(latitude: 51.50998, longitude: -0.1337),
         radius: CLLocationDistance(500),
         identifier: "London, England"
+    )
+    // TODO: replace with a configurable beacon
+    // Note that the forced unwrapped is necessary here and will always be valid.
+    static let beaconIdentityConstraint: CLBeaconIdentityConstraint = CLBeaconIdentityConstraint(
+        uuid: UUID.init(uuidString: "212D2900-B802-40B2-B0A3-8BDF3CBAF105")!,
+        major: CLBeaconMajorValue()
+    )
+    static let beaconRegion: CLBeaconRegion =  CLBeaconRegion(
+        beaconIdentityConstraint: AppState.beaconIdentityConstraint,
+        identifier: "CoreLocation-Redux"
     )
 
     // MARK: - App lifecycle
@@ -72,26 +85,32 @@ struct AppState: Equatable {
     let labelAccuracy = "Authorization accuracy : "
     let labelGetLocation = "Request Position !"
     let labelGetRegionState = "Request Region State !"
+    let labelGetBeaconState = "Request Beacon State !"
     let labelToggleLocationServices = "Monitor Location"
     let labelToggleSCLMonitoring = "Significant Location"
     let labelToggleHeadingMonitoring = "Update Heading"
     let labelToggleRegionMonitoring = "Region Monitoring"
+    let labelToggleBeaconRanging = "Beacon Ranging"
     let labelToggleVisitsMonitoring = "Receive Visit-related Events"
     let labelToggleAuthType = "Request Always On (no impact on status) ?"
+    let labelPickerRegionType = "Region Type : "
     let labelIsAvailableSLC = "SLC service : "
     let labelIsAvailableHeading = "Heading-related events : "
     let labelIsAvailableMonitoring = "Region Monitoring for CLCircularRegion : "
     let labelIsAvailableRanging = "Ranging for iBeacon : "
+    let labelRegionMonitoringFootNote = "Region with latitude: 51.50998, longitude: -0.1337"
+    let labelBeaconRangingFootNote = "Ranging beacon with identifier : 212D2900-...-8BDF3CBAF105"
     let labelErrorInformation = "Error : "
     
     // MARK: - Application logic
     
     // Service status
     var isAuthorized: Bool = false
-    var isLocationEnabled: Bool
+    var isLocationMonitoringEnabled: Bool
     var isSLCEnabled: Bool = false
     var isHeadingEnabled: Bool = false
-    var isRegionEnabled: Bool = false
+    var isRegionMonitoringEnabled: Bool = false
+    var isBeaconRangingEnabled: Bool = false
     // Device Capabilities
     var isSignificantLocationChangeCapable: Bool = false
     var isRegionMonitoringCapable: Bool = false
@@ -107,19 +126,24 @@ struct AppState: Equatable {
     var heading: CLHeading? = nil
     var region: CLRegion? = nil
     var regionStatus: CLRegionState? = nil
+    var beacons: [CLBeacon]? = nil
+    var beaconConstraint: CLBeaconIdentityConstraint? = nil
     // Configuration data
+    var regionChoice: CLRegion = AppState.regionToMonitor
+    var regionType: Int = 0
+    var isBeaconSlave = false
     
+    // Error
     var error: String = ""
     
     static var empty: AppState {
-        .init(isLocationEnabled: false)
+        .init(isLocationMonitoringEnabled: false)
     }
     
     static var mock: AppState {
-        .init(isLocationEnabled: false)
+        .init(isLocationMonitoringEnabled: false)
     }
 }
-
 
 // MARK: - STORE
 class Store: ReduxStoreBase<AppAction, AppState> {
@@ -170,14 +194,16 @@ let appMiddleware = LoggerMiddleware<IdentityMiddleware<AppAction, AppAction, Ap
                     return .request(.stop(.headingUpdates))
                 }
             case let .location(.toggleRegionMonitoring(status, region)):
-                if let region = region {
-                    if status {
-                        return .request(.start(.regionMonitoring(region)))
-                    } else {
-                        return .request(.stop(.regionMonitoring(region)))
-                    }
+                if status {
+                    return .request(.start(.regionMonitoring(region)))
                 } else {
-                    return nil
+                    return .request(.stop(.regionMonitoring(region)))
+                }
+            case let .location(.toggleBeaconRanging(status, constraint)):
+                if status {
+                    return .request(.start(.beaconRanging(constraint)))
+                } else {
+                    return .request(.stop(.beaconRanging(constraint)))
                 }
             case .location(.requestPosition): return .request(.requestPosition)
             case let .location(.requestRegionState(region)): return .request(.requestState(region))
@@ -191,8 +217,8 @@ let appMiddleware = LoggerMiddleware<IdentityMiddleware<AppAction, AppAction, Ap
             case let .status(.gotAuthzStatus(status)): return .location(.gotAuthorizationStatus(status))
             case let .status(.gotPosition(location)): return .location(.lastKnownPosition(location))
             case let .status(.gotHeading(heading)): return .location(.lastKnownHeading(heading))
-            case let .status(.gotRegion(region, state)): return
-                .location(.lastKnownRegionEvent(region, state))
+            case let .status(.gotRegion(region, state)): return .location(.lastKnownRegionEvent(region, state))
+            case let .status(.gotBeacon(beacons, constraint)): return .location(.lastKnownBeaconRanging(beacons, constraint))
             case let .status(.gotDeviceCapabilities(capabilities)): return .location(.gotDeviceCapabilities(capabilities))
             case let .status(.receiveError(error)): return .location(.triggerError(error))
             default: return .location(.toggleLocationServices(false))
@@ -224,12 +250,18 @@ extension Reducer where ActionType == CoreLocationAction, StateType == AppState 
     static let location = Reducer { action, state in
         var state = state
         switch action {
-        case let .toggleLocationServices(status): state.isLocationEnabled = status
+        case let .toggleLocationServices(status): state.isLocationMonitoringEnabled = status
         case let .toggleAuthorizationType(status): state.authorizationType = status ? .always : .whenInUse
         case let .toggleSLCMonitoring(status): state.isSLCEnabled = status
         case let .toggleHeadingUpdates(status): state.isHeadingEnabled = status
-        case let .toggleRegionMonitoring(status, _):
-            state.isRegionEnabled = status
+        case let .toggleRegionMonitoring(status, region):
+            state.isRegionMonitoringEnabled = status
+            state.regionChoice = region
+        case let .toggleBeaconRanging(status, constraint):
+            state.isBeaconRangingEnabled = status
+            state.beaconConstraint = constraint
+        case let .pickRegionType(type):
+            state.regionType = type
         case let .lastKnownPosition(location):
             state.location = location
             state.error = ""
@@ -239,6 +271,9 @@ extension Reducer where ActionType == CoreLocationAction, StateType == AppState 
         case let .lastKnownRegionEvent(region, status):
             state.region = region
             state.regionStatus = status
+        case let .lastKnownBeaconRanging(beacons, constraint):
+            state.beacons = beacons
+            state.beaconConstraint = constraint
         case let .triggerError(error):
             state.error = error.localizedDescription
             state.location = CLLocation()
@@ -349,7 +384,7 @@ extension ObservableViewModel where ViewAction == SectionLocationMonitoring.View
         
         return SectionLocationMonitoring.ViewState(
             sectionLocationMonitoringTitle: state.titleLocationServices,
-            toggleLocationServices: SectionLocationMonitoring.ContentItem(title: state.labelToggleLocationServices, value: state.isLocationEnabled),
+            toggleLocationServices: SectionLocationMonitoring.ContentItem(title: state.labelToggleLocationServices, value: state.isLocationMonitoringEnabled),
             buttonLocationRequest: SectionLocationMonitoring.ContentItem(title: state.labelGetLocation, value: "", action: .getPositionButtonTapped)
         )
     }
@@ -458,7 +493,13 @@ extension ObservableViewModel where ViewAction == SectionRegionMonitoring.ViewAc
     
     private static func transform(_ viewAction: SectionRegionMonitoring.ViewAction) -> AppAction? {
         switch viewAction {
-        case let .toggleRegionMonitoring(status): return .location(.toggleRegionMonitoring(status, AppState.regionToMonitor))
+        case let .pickRegionType(type): return .location(.pickRegionType(type))
+        case let .toggleRegionMonitoring(status, type):
+            var region: CLRegion = AppState.regionToMonitor
+            if type == 1 {
+                region = AppState.beaconRegion
+            }
+            return .location(.toggleRegionMonitoring(status, region))
         case .getRegionStateButtonTapped: return .location(.requestRegionState(AppState.regionToMonitor))
         }
     }
@@ -476,23 +517,87 @@ extension ObservableViewModel where ViewAction == SectionRegionMonitoring.ViewAc
             region = ""
         }
         
+        var footnote: String = state.labelRegionMonitoringFootNote
+        if state.regionType == 1 {
+            footnote = state.labelBeaconRangingFootNote
+        }
+                
         return SectionRegionMonitoring.ViewState(
             sectionRegionMonitoringTitle: state.titleRegionMonitoring,
+            pickerRegionType: SectionRegionMonitoring.ContentItem(
+                title: state.labelPickerRegionType,
+                value: SectionRegionMonitoring.pickerConfig[state.regionType]
+            ),
             toggleRegionMonitoringServices:
                 SectionRegionMonitoring.ContentItem(
                     title: state.labelToggleRegionMonitoring,
-                    value: state.isRegionEnabled
+                    value: state.isRegionMonitoringEnabled
                 ),
             regionInformation:
                 SectionRegionMonitoring.ContentItem(
                     title: state.labelInfo,
                     value: status + region
                 ),
+            disclaimerInfo:
+                SectionRegionMonitoring.ContentItem(
+                    title: "",
+                    value: footnote
+                ),
             buttonRegionStateRequest:
                 SectionRegionMonitoring.ContentItem(
                     title: state.labelGetRegionState,
                     value: "",
                     action: .getRegionStateButtonTapped)
+        )
+    }
+}
+
+extension ObservableViewModel where ViewAction == SectionBeaconRanging.ViewAction, ViewState == SectionBeaconRanging.ViewState {
+    static func beaconSection<S: StoreType>(store: S) -> ObservableViewModel
+    where S.ActionType == AppAction, S.StateType == AppState {
+        return store
+            .projection(action: Self.transform, state: Self.transform)
+            .asObservableViewModel(initialState: .empty)
+    }
+    
+    private static func transform(_ viewAction: SectionBeaconRanging.ViewAction) -> AppAction? {
+        switch viewAction {
+        case let .toggleBeaconRanging(status): return .location(.toggleBeaconRanging(status, AppState.beaconIdentityConstraint))
+        case .getBeaconStateButtonTapped: return .location(.requestRegionState(AppState.beaconRegion))
+        }
+    }
+    
+    private static func transform(from state: AppState) -> SectionBeaconRanging.ViewState {
+        
+        var beaconsInfo: String = ""
+        
+        if let beacons = state.beacons {
+            beaconsInfo = beacons
+                .map { (beacon: CLBeacon) in
+                    beacon.uuid.uuidString + ": " + beacon.rssi.description
+                }
+                .reduce("") { result, info in
+                    result.isEmpty ? info : result + ", " + info
+                }
+        }
+        
+        return SectionBeaconRanging.ViewState(
+            sectionBeaconRangingTitle: state.titleBeaconRanging,
+            toggleBeaconRangingServices:
+                SectionBeaconRanging.ContentItem(
+                    title: state.labelToggleBeaconRanging,
+                    value: state.isBeaconRangingEnabled
+                ),
+            beaconInformation:
+                SectionBeaconRanging.ContentItem(
+                    title: state.labelInfo,
+                    value: beaconsInfo
+                ),
+            buttonBeaconStateRequest:
+                SectionBeaconRanging.ContentItem(
+                    title: state.labelGetBeaconState,
+                    value: "",
+                    action: .getBeaconStateButtonTapped)
         )
     }
 }
@@ -510,6 +615,7 @@ extension ViewProducer where Context == Void, ProducedView == Content {
                 slcSectionProducer: .slcSection(store: store),
                 headingSectionProducer: .headingSection(store: store),
                 regionSectionProducer: .regionSection(store: store),
+                beaconSectionProducer: .beaconSection(store: store),
                 capabilitiesSectionProducer: .capabilitiesSection(store: store)
             )
         }
@@ -575,6 +681,15 @@ extension ViewProducer where Context == Void, ProducedView == SectionRegionMonit
     where S.ActionType == AppAction, S.StateType == AppState {
         ViewProducer {
             SectionRegionMonitoring(viewModel: .regionSection(store: store))
+        }
+    }
+}
+
+extension ViewProducer where Context == Void, ProducedView == SectionBeaconRanging {
+    static func beaconSection<S: StoreType>(store: S) -> ViewProducer
+    where S.ActionType == AppAction, S.StateType == AppState {
+        ViewProducer {
+            SectionBeaconRanging(viewModel: .beaconSection(store: store))
         }
     }
 }

@@ -41,7 +41,9 @@ struct SectionHeadingUpdates_Previews: PreviewProvider {
     static let mockViewModel = ObservableViewModel.headingSection(store: mockStore)
 
     static var previews: some View {
-        SectionHeadingUpdates(viewModel: mockViewModel)
+        Form {
+            SectionHeadingUpdates(viewModel: mockViewModel)
+        }
     }
 }
 
@@ -58,8 +60,8 @@ extension SectionHeadingUpdates {
         static var empty: ViewState {
             .init(
                 sectionHeadingUpdatesTitle: "",
-                toggleHeadingServices: ContentItem(title: "", value: false),
-                headingInformation: ContentItem(title: "", value: "")
+                toggleHeadingServices: SectionHeadingUpdates.ContentItem(title: "", value: false),
+                headingInformation: SectionHeadingUpdates.ContentItem(title: "", value: "")
             )
         }
     }

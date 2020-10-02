@@ -35,7 +35,9 @@ struct SectionInformation_Previews: PreviewProvider {
     static let mockViewModel = ObservableViewModel.informationSection(store: mockStore)
 
     static var previews: some View {
-        SectionInformation(viewModel: mockViewModel)
+        Form {
+            SectionInformation(viewModel: mockViewModel)
+        }
     }
 }
 
@@ -48,8 +50,8 @@ extension SectionInformation {
         
         static var empty: ViewState {
             .init(
-                locationInformation: ContentItem(title: "", value: ""),
-                errorInformation: ContentItem(title: "", value: "")
+                locationInformation: SectionInformation.ContentItem(title: "", value: ""),
+                errorInformation: SectionInformation.ContentItem(title: "", value: "")
             )
         }
     }

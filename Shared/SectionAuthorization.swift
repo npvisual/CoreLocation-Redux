@@ -46,7 +46,9 @@ struct SectionAuthorization_Previews: PreviewProvider {
     static let mockViewModel = ObservableViewModel.authzSection(store: mockStore)
     
     static var previews: some View {
-        SectionAuthorization(viewModel: mockViewModel)
+        Form {
+            SectionAuthorization(viewModel: mockViewModel)
+        }
     }
 }
 
@@ -67,10 +69,10 @@ extension SectionAuthorization {
         static var empty: ViewState {
             .init(
                 sectionAuthorizationTitle: "",
-                toggleAuthType: ContentItem(title: "", value: false),
-                buttonAuthorizationRequest: ContentItem(title: "", value: ""),
-                textAuthorization: ContentItem(title: "", value: ""),
-                textAccuracy: ContentItem(title: "", value: "")
+                toggleAuthType: SectionAuthorization.ContentItem(title: "", value: false),
+                buttonAuthorizationRequest: SectionAuthorization.ContentItem(title: "", value: ""),
+                textAuthorization: SectionAuthorization.ContentItem(title: "", value: ""),
+                textAccuracy: SectionAuthorization.ContentItem(title: "", value: "")
             )
         }
     }

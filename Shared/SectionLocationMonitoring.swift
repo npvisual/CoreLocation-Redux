@@ -43,7 +43,9 @@ struct SectionLocationMonitoring_Previews: PreviewProvider {
     static let mockViewModel = ObservableViewModel.locationSection(store: mockStore)
 
     static var previews: some View {
-        SectionLocationMonitoring(viewModel: mockViewModel)
+        Form {
+            SectionLocationMonitoring(viewModel: mockViewModel)
+        }
     }
 }
 
@@ -61,8 +63,8 @@ extension SectionLocationMonitoring {
         static var empty: ViewState {
             .init(
                 sectionLocationMonitoringTitle: "",
-                toggleLocationServices: ContentItem(title: "", value: false),
-                buttonLocationRequest: ContentItem(title: "", value: "")
+                toggleLocationServices: SectionLocationMonitoring.ContentItem(title: "", value: false),
+                buttonLocationRequest: SectionLocationMonitoring.ContentItem(title: "", value: "")
             )
         }
     }

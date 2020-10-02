@@ -37,7 +37,9 @@ struct SectionSLCMonitoring_Previews: PreviewProvider {
     static let mockViewModel = ObservableViewModel.slcSection(store: mockStore)
 
     static var previews: some View {
-        SectionSLCMonitoring(viewModel: mockViewModel)
+        Form {
+            SectionSLCMonitoring(viewModel: mockViewModel)
+        }
     }
 }
 
@@ -53,7 +55,7 @@ extension SectionSLCMonitoring {
         static var empty: ViewState {
             .init(
                 sectionSLCMonitoringTitle: "",
-                toggleSCLServices: ContentItem(title: "", value: false)
+                toggleSCLServices: SectionSLCMonitoring.ContentItem(title: "", value: false)
             )
         }
     }

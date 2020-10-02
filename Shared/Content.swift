@@ -19,6 +19,7 @@ struct Content: View {
     let slcSectionProducer: ViewProducer<Void, SectionSLCMonitoring>
     let headingSectionProducer: ViewProducer<Void, SectionHeadingUpdates>
     let regionSectionProducer: ViewProducer<Void, SectionRegionMonitoring>
+    let beaconSectionProducer: ViewProducer<Void, SectionBeaconRanging>
     let capabilitiesSectionProducer: ViewProducer<Void, SectionDeviceCapabilities>
     
     var body: some View {
@@ -33,11 +34,7 @@ struct Content: View {
                 slcSectionProducer.view()
                 headingSectionProducer.view()
                 regionSectionProducer.view()
-                Section(header: Text(viewModel.state.sectionBeaconRangingTitle)) {
-                    Toggle(isOn: .constant(false)) {
-                        Text("Beacon Ranging")
-                    }
-                }
+                beaconSectionProducer.view()
                 capabilitiesSectionProducer.view()
             }
         }
@@ -60,6 +57,7 @@ struct Content_Previews: PreviewProvider {
     static let mockSLCSectionProducer = ViewProducer.slcSection(store: mockStore)
     static let mockHeadingSectionProducer = ViewProducer.headingSection(store: mockStore)
     static let mockRegionSectionProducer = ViewProducer.regionSection(store: mockStore)
+    static let mockBeaconSectionProducer = ViewProducer.beaconSection(store: mockStore)
     static let mockCapabilitiesSectionProducer = ViewProducer.capabilitiesSection(store: mockStore)
     
     static var previews: some View {
@@ -71,6 +69,7 @@ struct Content_Previews: PreviewProvider {
             slcSectionProducer: mockSLCSectionProducer,
             headingSectionProducer: mockHeadingSectionProducer,
             regionSectionProducer: mockRegionSectionProducer,
+            beaconSectionProducer: mockBeaconSectionProducer,
             capabilitiesSectionProducer: mockCapabilitiesSectionProducer
         )
     }
@@ -84,13 +83,13 @@ extension Content {
     struct ViewState: Equatable {
         let titleView: String
         let sectionBeaconRangingTitle: String
-        let buttonLocationRequest: ContentItem<String>
+        let buttonLocationRequest: Content.ContentItem<String>
         
         static var empty: ViewState {
             .init(
                 titleView: "",
                 sectionBeaconRangingTitle: "",
-                buttonLocationRequest: ContentItem(title: "", value: "")
+                buttonLocationRequest: Content.ContentItem(title: "", value: "")
             )
         }
     }

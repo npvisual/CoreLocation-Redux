@@ -20,6 +20,8 @@
 		8E76E2C5252385E900229344 /* SectionLocationMonitoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E76E2C3252385E900229344 /* SectionLocationMonitoring.swift */; };
 		8E76E2CB252388A600229344 /* SectionDeviceCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E76E2CA252388A600229344 /* SectionDeviceCapabilities.swift */; };
 		8E76E2CC252388A600229344 /* SectionDeviceCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E76E2CA252388A600229344 /* SectionDeviceCapabilities.swift */; };
+		8EC1B1C62525F2D800AE54E8 /* SectionBeaconRanging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC1B1C52525F2D800AE54E8 /* SectionBeaconRanging.swift */; };
+		8EC1B1C72525F2D800AE54E8 /* SectionBeaconRanging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC1B1C52525F2D800AE54E8 /* SectionBeaconRanging.swift */; };
 		8ECC811E25101DD200CC8427 /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC811D25101DD200CC8427 /* Tests_iOS.swift */; };
 		8ECC812925101DD200CC8427 /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC812825101DD200CC8427 /* Tests_macOS.swift */; };
 		8ECC812B25101DD200CC8427 /* CoreLocation_ReduxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC810225101DD000CC8427 /* CoreLocation_ReduxApp.swift */; };
@@ -65,6 +67,7 @@
 		8E6A08DE252540C500796888 /* SectionRegionMonitoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionRegionMonitoring.swift; sourceTree = "<group>"; };
 		8E76E2C3252385E900229344 /* SectionLocationMonitoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionLocationMonitoring.swift; sourceTree = "<group>"; };
 		8E76E2CA252388A600229344 /* SectionDeviceCapabilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionDeviceCapabilities.swift; sourceTree = "<group>"; };
+		8EC1B1C52525F2D800AE54E8 /* SectionBeaconRanging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionBeaconRanging.swift; sourceTree = "<group>"; };
 		8ECC810225101DD000CC8427 /* CoreLocation_ReduxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreLocation_ReduxApp.swift; sourceTree = "<group>"; };
 		8ECC810325101DD000CC8427 /* Content.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Content.swift; sourceTree = "<group>"; };
 		8ECC810425101DD200CC8427 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -149,6 +152,7 @@
 				8EE3B7642525292F0010F6B4 /* SectionSLCMonitoring.swift */,
 				8E6A08D72525350F00796888 /* SectionHeadingUpdates.swift */,
 				8E6A08DE252540C500796888 /* SectionRegionMonitoring.swift */,
+				8EC1B1C52525F2D800AE54E8 /* SectionBeaconRanging.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -368,6 +372,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8EC1B1C62525F2D800AE54E8 /* SectionBeaconRanging.swift in Sources */,
 				8EE3B7652525292F0010F6B4 /* SectionSLCMonitoring.swift in Sources */,
 				8ECC812D25101DD200CC8427 /* Content.swift in Sources */,
 				8E76E2CB252388A600229344 /* SectionDeviceCapabilities.swift in Sources */,
@@ -387,6 +392,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8EC1B1C72525F2D800AE54E8 /* SectionBeaconRanging.swift in Sources */,
 				8EE3B7662525292F0010F6B4 /* SectionSLCMonitoring.swift in Sources */,
 				8ECC812E25101DD200CC8427 /* Content.swift in Sources */,
 				8E76E2CC252388A600229344 /* SectionDeviceCapabilities.swift in Sources */,

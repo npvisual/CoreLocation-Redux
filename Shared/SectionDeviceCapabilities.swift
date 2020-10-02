@@ -36,7 +36,9 @@ struct SectionDeviceCapabilities_Previews: PreviewProvider {
     static let mockViewModel = ObservableViewModel.capabilitiesSection(store: mockStore)
 
     static var previews: some View {
-        SectionDeviceCapabilities(viewModel: mockViewModel)
+        Form {
+            SectionDeviceCapabilities(viewModel: mockViewModel)
+        }
     }
 }
 
@@ -54,10 +56,10 @@ extension SectionDeviceCapabilities {
         static var empty: ViewState {
             .init(
                 sectionDeviceCapabilitiesTitle: "",
-                textIsSLCCapable: ContentItem(title: "", value: false),
-                textIsRegionMonitoringCapable: ContentItem(title: "", value: false),
-                textIsRangingCapable: ContentItem(title: "", value: false),
-                textIsHeadingCapable: ContentItem(title: "", value: false)
+                textIsSLCCapable: SectionDeviceCapabilities.ContentItem(title: "", value: false),
+                textIsRegionMonitoringCapable: SectionDeviceCapabilities.ContentItem(title: "", value: false),
+                textIsRangingCapable: SectionDeviceCapabilities.ContentItem(title: "", value: false),
+                textIsHeadingCapable: SectionDeviceCapabilities.ContentItem(title: "", value: false)
             )
         }
     }
