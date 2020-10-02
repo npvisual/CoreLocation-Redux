@@ -11,4 +11,4 @@ This version contains :
 * support for visit-related events
 * support for heading updates
 
-For more information on using Beacon Ranging, please take a look at[this post](https://github.com/npvisual/CoreLocation-Redux/wiki/Using-Beacon-Ranging) on the Wiki. Setting up an iBeacon for playing with beacon ranging isn't too complicated, but is somewhat out of scope for this middleware. Luckily, Apple provides a project that can be downloaded and easily used on a secondary device to test beacon ranging.
+For more information on using [Beacon Ranging](https://developer.apple.com/documentation/corelocation/ranging_for_beacons), please take a look at [this post](https://github.com/npvisual/CoreLocation-Redux/wiki/Using-Beacon-Ranging) on the Wiki. Setting up an iBeacon for playing with Beacon Ranging isn't too complicated, but is somewhat out of scope for this middleware. Luckily, Apple provides a project that can be downloaded and easily used on a secondary device to test ranging (and region monitoring for [CLBeaconRegion](https://developer.apple.com/documentation/corelocation/clbeaconregion)).
