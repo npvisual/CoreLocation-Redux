@@ -14,9 +14,9 @@
         "package": "CoreLocationMiddleware",
         "repositoryURL": "https://github.com/SwiftRex/CoreLocationMiddleware",
         "state": {
-          "branch": "development",
-          "revision": "ebbb97bbaf01e371f804f9fe5c10e8421a0c10ef",
-          "version": null
+          "branch": null,
+          "revision": "24fcb2e326cad7d691ddcc777d3374e5e51ff8b2",
+          "version": "0.2.1"
         }
       },
       {

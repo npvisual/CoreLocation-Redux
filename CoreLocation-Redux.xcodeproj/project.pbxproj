@@ -796,8 +796,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SwiftRex/CoreLocationMiddleware";
 			requirement = {
-				branch = development;
-				kind = branch;
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.2.0;
 			};
 		};
 		8ECC813F25101E5E00CC8427 /* XCRemoteSwiftPackageReference "SwiftRex" */ = {
